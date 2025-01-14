@@ -1,25 +1,21 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
+  postgres:
+    image: postgres:14.15
     container_name: troy-database
     restart: unless-stopped
-    env_file: .env
     ports:
-      - "3606:3306"
+      - "5445:5432"
     networks:
       troy:
         ipv4_address: 172.220.117.2
     volumes:
-      - ./docker/init.sql:/docker-entrypoint-initdb.d/init-database.sql
-      - ./docker/data:/var/lib/mysql
+      - ./docker/data:/var/lib/postgresql/data
     environment:
-      MYSQL_DATABASE: troy
-      MYSQL_ROOT_PASSWORD: 123
-      MYSQL_USER: troy
-      MYSQL_PASSWORD: troyofme
-    command: --default-authentication-plugin=mysql_native_password
+      POSTGRES_DB: troy
+      POSTGRES_USER: troy
+      POSTGRES_PASSWORD: troyofme
 
 
   backend:
