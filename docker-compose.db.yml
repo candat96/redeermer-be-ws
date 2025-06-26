@@ -13,3 +13,5 @@ services:
       POSTGRES_DB: redeermer
       POSTGRES_USER: redeermer
       POSTGRES_PASSWORD: redeermer@2025
+      TZ: UTC
+      PGTZ: UTC

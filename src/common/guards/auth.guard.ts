@@ -1,4 +1,5 @@
 import { AppConstants } from '@common/constants/app.constant';
+import { UserRole } from '@common/constants/enum/user.enum';
 import { ErrorCode } from '@common/constants/error.constant';
 import { Config } from '@config/config';
 import {
@@ -9,25 +10,25 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-export interface IAccessTokenAuth {
+export class AccessTokenDataDto {
   id: string;
   name: string;
   avatar: string;
-  role: any; // Todo: Replace any with role enum if it exists
+  role: UserRole;
 }
 
-export interface IAccessTokenPayload {
-  user: IAccessTokenAuth;
+export class AccessTokenPayloadDto {
+  user: AccessTokenDataDto;
   iat: number;
   exp: number;
 }
 
-export interface IRefreshTokenAuth {
+export class RefreshTokenDataDto {
   id: string;
 }
 
-export interface IRefreshTokenPayload {
-  user: IRefreshTokenAuth;
+export class RefreshTokenPayloadDto {
+  user: RefreshTokenDataDto;
   iat: number;
   exp: number;
 }
@@ -45,7 +46,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const { user }: IAccessTokenPayload = await this.jwtService.verifyAsync(
+      const { user }: AccessTokenPayloadDto = await this.jwtService.verifyAsync(
         token,
         {
           secret: Config.JWT_SECRET,
