@@ -1,7 +1,7 @@
 {
-  "name": "troy-docker",
+  "name": "redeermer-be-ws",
   "version": "0.0.1",
-  "description": "Base NestJS with docker and mysql",
+  "description": "Redeermer Backend Service",
   "author": "marco-bui",
   "private": true,
   "license": "UNLICENSED",
@@ -37,6 +37,7 @@
     "dotenv": "^16.4.5",
     "moment-timezone": "^0.5.45",
     "mysql": "^2.18.1",
+    "pg": "^8.16.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20",

@@ -44,8 +44,8 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV !== NodeEnv.PRODUCTION) {
     const config = new DocumentBuilder()
-      .setTitle('Troy Docker API Docs')
-      .setDescription('Troy Docker API Docs')
+      .setTitle('Redeermer API Docs')
+      .setDescription('Redeermer API Docs')
       .setVersion('1.0')
       .addBearerAuth()
       .build();

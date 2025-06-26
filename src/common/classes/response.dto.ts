@@ -1,12 +1,6 @@
 import { ApiMessageKey } from '@common/constants/message.constant';
-import { getApiMessage } from '@common/utils/utils';
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-
-export enum Lang {
-  VI = 'vi',
-  EN = 'en',
-}
 
 interface IPagination {
   page: number;
@@ -54,7 +48,7 @@ export interface IApiResponse {
   data: any;
   pagination: IPagination | null;
   message: ApiMessageKey;
-  lang: Lang;
+  metadata?: Record<string, any>;
 }
 
 export class PaginatedResponse<T> {
@@ -82,13 +76,18 @@ export class ApiResponseDto<T> {
 
   @ApiProperty({ required: false })
   @ApiResponseProperty()
+  metadata?: Record<string, any>;
+
+  @ApiProperty({ required: false })
+  @ApiResponseProperty()
   message?: string;
 
   constructor(props: IApiResponse) {
     this.statusCode = props.statusCode;
     this.data = props.data;
     this.pagination = props.pagination ? new Pagination(props.pagination) : null;
-    this.message = getApiMessage(props.message, props.lang);
+    this.metadata = props.metadata || null;
+    this.message = props.message;
   }
 }
 

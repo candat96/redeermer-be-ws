@@ -1,42 +1,15 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:14.15
-    container_name: troy-database
-    restart: unless-stopped
-    ports:
-      - "5445:5432"
-    networks:
-      troy:
-        ipv4_address: 172.220.117.2
-    volumes:
-      - ./docker/data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: troy
-      POSTGRES_USER: troy
-      POSTGRES_PASSWORD: troyofme
-
-
   backend:
-    image: troy
+    image: redeermer
     build: .
-    container_name: troy
+    container_name: redeermer
     restart: always
     env_file: .env
     ports:
-      - "4869:4869"
-    networks:
-      - troy
+      - "1432:1432"
     volumes:
       - ./assets:/app/assets
     environment:
-      - TZ=Asia/Ho_Chi_Minh
-
-networks:
-  troy:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.220.117.0/24
-          gateway: 172.220.117.1
+      - TZ=UTC

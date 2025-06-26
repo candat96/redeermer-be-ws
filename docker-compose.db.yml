@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.15
+    container_name: redeermer-database
+    restart: unless-stopped
+    ports:
+      - "2345:5432"
+    volumes:
+      - ./docker/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: redeermer
+      POSTGRES_USER: redeermer
+      POSTGRES_PASSWORD: redeermer@2025
