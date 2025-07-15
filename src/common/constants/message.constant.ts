@@ -6,4 +6,8 @@ export enum ApiMessageKey {
   GET_USER_DETAIL_SUCCESS = 'Get user details successfully.',
   UPDATE_USER_SUCCESS = 'Update user successfully.',
   DELETE_USER_SUCCESS = 'Delete user successfully.',
+  SEND_OTP_SUCCESS = 'Send OTP successfully.',
+  VERIFY_OTP_SUCCESS = 'Verify OTP successfully.',
+  ADD_EMAIL_INTO_WHITELIST_SUCCESS = 'Add email into whitelist successfully.',
+  REMOVE_EMAIL_FROM_WHITELIST_SUCCESS = 'Remove email into whitelist successfully.',
 }
