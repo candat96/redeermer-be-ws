@@ -7,4 +7,7 @@ export enum ErrorCode {
   INVALID_PASSWORD = 'Invalid password.',
   INACTIVE_USER = 'Inactive user.',
   EMAIL_HAS_BEEN_USED = 'Email has been registered.',
+  EMAIL_IS_NOT_IN_WHITELIST = 'Email is not in whitelist.',
+  EMAIL_TEMPLATE_NOT_FOUND = 'Email template not found.',
+  INVALID_OTP = 'Invalid OTP.',
 }

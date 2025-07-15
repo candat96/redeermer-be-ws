@@ -44,8 +44,8 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV !== NodeEnv.PRODUCTION) {
     const config = new DocumentBuilder()
-      .setTitle('Redeermer API Docs')
-      .setDescription('Redeermer API Docs')
+      .setTitle('Redeemer API Docs')
+      .setDescription('Redeemer API Docs')
       .setVersion('1.0')
       .addBearerAuth()
       .build();
