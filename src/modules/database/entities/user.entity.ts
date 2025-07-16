@@ -1,6 +1,12 @@
-import { UserGender, UserRole, UserStatus } from '@common/constants/enum/user.enum';
+import {
+  KycStatus,
+  UserGender,
+  UserRole,
+  UserStatus,
+} from '@common/constants/enum/user.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
-import { Column, Entity } from 'typeorm';
+import { UserDocumentEntity } from '@modules/database/entities/user-document.entity';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -33,7 +39,7 @@ export class UserEntity extends BaseEntity {
     type: 'enum',
     enum: UserRole,
     nullable: false,
-    default: UserRole.CUSTOMER,
+    default: UserRole.INVESTOR,
   })
   role: UserRole;
 
@@ -44,4 +50,10 @@ export class UserEntity extends BaseEntity {
     default: UserStatus.ACTIVE,
   })
   status: UserStatus;
+
+  @Column({ type: 'enum', enum: KycStatus, default: KycStatus.UNVERIFIED })
+  kycStatus: KycStatus;
+
+  @OneToMany(() => UserDocumentEntity, (doc) => doc.user)
+  documents: UserDocumentEntity[];
 }

@@ -81,7 +81,7 @@ export class UserService {
         avatar: dto.avatar,
         background: dto.background,
         gender: dto.gender,
-        role: UserRole.CUSTOMER,
+        role: UserRole.INVESTOR,
         status: UserStatus.ACTIVE,
       }),
     );

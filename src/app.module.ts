@@ -4,6 +4,7 @@ import { ApiLoggerMiddleware } from '@middlewares/logger.middleware';
 import { AuthModule } from '@modules/authentication/authentication.module';
 import { DatabaseModule } from '@modules/database/database.module';
 import { UserModule } from '@modules/user/user.module';
+import { UserDocumentModule } from '@modules/user-document/user-document.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
@@ -17,6 +18,7 @@ import { AppController } from './app.controller';
     AuthModule,
     DatabaseModule,
     UserModule,
+    UserDocumentModule,
   ],
   controllers: [AppController],
   providers: [WinstonLoggerService],
