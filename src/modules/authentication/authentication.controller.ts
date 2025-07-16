@@ -11,6 +11,8 @@ import {
   RegisterDto,
   RegisterResponseDto,
 } from '@modules/authentication/dto/register.dto';
+import { SendOtpDto } from '@modules/authentication/dto/send-otp.dto';
+import { VerifyOtpDto } from '@modules/authentication/dto/verify-otp.dto';
 import {
   Body,
   Controller,
@@ -85,6 +87,48 @@ export class AuthenticationController {
         statusCode: HttpStatus.OK,
         data: await this.authService.refreshToken(body),
         message: ApiMessageKey.REFRESH_TOKEN_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Post('otp/send')
+  @ApiOperation({
+    summary: 'Send OTP',
+    description: 'Send OTP',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOkResponse({ type: ApiResponseDto<boolean> })
+  async sendOtp(@Body() body: SendOtpDto): Promise<ApiResponseDto<boolean>> {
+    try {
+      return new ApiResponseDto<boolean>({
+        statusCode: HttpStatus.OK,
+        data: await this.authService.sendOtp(body),
+        message: ApiMessageKey.SEND_OTP_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Post('otp/verify')
+  @ApiOperation({
+    summary: 'Verify OTP',
+    description: 'Verify OTP',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOkResponse({ type: ApiResponseDto<boolean> })
+  async verifyOtp(@Body() body: VerifyOtpDto): Promise<ApiResponseDto<boolean>> {
+    try {
+      return new ApiResponseDto<boolean>({
+        statusCode: HttpStatus.OK,
+        data: await this.authService.verifyOtp(body),
+        message: ApiMessageKey.VERIFY_OTP_SUCCESS,
         pagination: null,
       });
     } catch (err) {
