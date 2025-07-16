@@ -10,4 +10,6 @@ export enum ErrorCode {
   EMAIL_IS_NOT_IN_WHITELIST = 'Email is not in whitelist.',
   EMAIL_TEMPLATE_NOT_FOUND = 'Email template not found.',
   INVALID_OTP = 'Invalid OTP.',
+  GET_PAYPAL_ACCESS_TOKEN_FAILED = 'Get PayPal access token failed.',
+  CREATE_PAYPAL_CHECKOUT_ORDER_FAILED = 'Create PayPal checkout order failed.',
 }
