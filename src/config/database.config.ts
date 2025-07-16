@@ -1,4 +1,3 @@
-import { UserEntity } from '@modules/database/entities/user.entity';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const DatabaseConfig: TypeOrmModuleOptions = {
@@ -11,5 +10,5 @@ export const DatabaseConfig: TypeOrmModuleOptions = {
   synchronize: true,
   autoLoadEntities: true,
   logging: false,
-  entities: [UserEntity],
+  entities: ['dist/modules/**/*.{entity,entities}.{js,ts}'],
 };

@@ -5,6 +5,7 @@ import { AuthenticationModule } from '@modules/authentication/authentication.mod
 import { DatabaseModule } from '@modules/database/database.module';
 import { PaymentModule } from '@modules/payment/payment.module';
 import { UserModule } from '@modules/user/user.module';
+import { UserDocumentModule } from '@modules/user-document/user-document.module';
 import { WhitelistEmailModule } from '@modules/whitelist-email/whitelist-email.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
@@ -25,6 +26,7 @@ import { AppController } from './app.controller';
     PaymentModule,
     UserModule,
     WhitelistEmailModule,
+    UserDocumentModule,
   ],
   controllers: [AppController],
   providers: [WinstonLoggerService],

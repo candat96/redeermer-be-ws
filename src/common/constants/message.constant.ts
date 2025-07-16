@@ -10,6 +10,9 @@ export enum ApiMessageKey {
   VERIFY_OTP_SUCCESS = 'Verify OTP successfully.',
   ADD_EMAIL_INTO_WHITELIST_SUCCESS = 'Add email into whitelist successfully.',
   REMOVE_EMAIL_FROM_WHITELIST_SUCCESS = 'Remove email into whitelist successfully.',
+  UPLOAD_FILES_SUCCESS = 'Upload files thành công.',
+  UPLOAD_DOCUMENT_SUCCESS = 'Hồ sơ khách hàng đẩy lên thành công.',
+  GET_DOCUMENT_SUCCESS = 'Lấy hồ sơ khách hàng thành công.',
   CREATE_CHECKOUT_LINK_SUCCESS = 'Create checkout link successfully.',
   RECEIVE_CHECKOUT_WEBHOOKS_SUCCESS = 'Receiving checkout webhook successfully.',
 }
