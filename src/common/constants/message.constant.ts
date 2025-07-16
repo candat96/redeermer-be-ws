@@ -13,4 +13,6 @@ export enum ApiMessageKey {
   UPLOAD_FILES_SUCCESS = 'Upload files thành công.',
   UPLOAD_DOCUMENT_SUCCESS = 'Hồ sơ khách hàng đẩy lên thành công.',
   GET_DOCUMENT_SUCCESS = 'Lấy hồ sơ khách hàng thành công.',
+  CREATE_CHECKOUT_LINK_SUCCESS = 'Create checkout link successfully.',
+  RECEIVE_CHECKOUT_WEBHOOKS_SUCCESS = 'Receiving checkout webhook successfully.',
 }
