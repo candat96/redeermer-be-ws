@@ -10,4 +10,5 @@ export enum ErrorCode {
   EMAIL_IS_NOT_IN_WHITELIST = 'Email is not in whitelist.',
   EMAIL_TEMPLATE_NOT_FOUND = 'Email template not found.',
   INVALID_OTP = 'Invalid OTP.',
+  ACCOUNT_HAS_NOT_KYC = 'You need KYC before using.',
 }
