@@ -1,4 +1,7 @@
-import { ProjectFieldReviewEnum } from '@common/constants/enum/project-field-review.enum';
+import {
+  FieldNameEnum,
+  ProjectFieldReviewEnum,
+} from '@common/constants/enum/project-field-review.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
@@ -6,8 +9,12 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('project_field_reviews')
 export class ProjectFieldReviewEntity extends BaseEntity {
-  @Column({ type: String, nullable: false })
-  fieldName: string;
+  @Column({
+    type: 'enum',
+    enum: FieldNameEnum,
+    nullable: false,
+  })
+  fieldName: FieldNameEnum;
 
   @Column({
     type: 'enum',

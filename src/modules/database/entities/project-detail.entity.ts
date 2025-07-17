@@ -4,7 +4,7 @@ import {
 } from '@common/constants/enum/project-detail.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity('project_details')
 export class ProjectDetailEntity extends BaseEntity {
@@ -28,12 +28,7 @@ export class ProjectDetailEntity extends BaseEntity {
   })
   legalStatus: LegalStatus;
 
-  @Column('text', { array: true, nullable: true })
-  mediaUrls: string[];
-
-  @Column({ type: 'text', nullable: true })
-  floorPlanUrl: string;
-
   @OneToOne(() => ProjectEntity, (project) => project.detail)
+  @JoinColumn()
   project: ProjectEntity;
 }

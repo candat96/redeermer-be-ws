@@ -2,8 +2,14 @@ import {
   CurrentStatus,
   LegalStatus,
 } from '@common/constants/enum/project-detail.enum';
-import { ProjectDocumentVerifyStatusEnum } from '@common/constants/enum/project-document.enum';
-import { ProjectFieldReviewEnum } from '@common/constants/enum/project-field-review.enum';
+import {
+  ProjectDocumentType,
+  ProjectDocumentVerifyStatusEnum,
+} from '@common/constants/enum/project-document.enum';
+import {
+  FieldNameEnum,
+  ProjectFieldReviewEnum,
+} from '@common/constants/enum/project-field-review.enum';
 import {
   ProjectSaleStatusEnum,
   ProjectType,
@@ -16,7 +22,6 @@ import {
   IsNumber,
   IsOptional,
   IsDateString,
-  IsArray,
   ValidateNested,
   IsEnum,
   IsNotEmpty,
@@ -24,7 +29,7 @@ import {
 
 export class CreateProjectDetailDto {
   @ApiProperty({ example: '1200.5', description: 'Total area in square meters' })
-  @IsNumber()
+  @IsString()
   area: string;
 
   @ApiProperty({ example: 10, description: 'Number of floors' })
@@ -57,30 +62,11 @@ export class CreateProjectDetailDto {
   })
   @IsEnum(LegalStatus)
   legalStatus?: LegalStatus;
-
-  @ApiProperty({
-    example: ['https://example.com/image1.jpg'],
-    required: false,
-    description: 'Media URLs',
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  mediaUrls?: string[];
-
-  @ApiProperty({
-    example: 'https://example.com/floorplan.pdf',
-    required: false,
-    description: 'Floor plan URL',
-  })
-  @IsOptional()
-  @IsString()
-  floorPlanUrl?: string;
 }
 
 export class CreateInvestmentInfoDto {
   @ApiProperty({
-    example: 1000000,
+    example: '1000000',
     description: 'Proposed investment value for the project (e.g., 1,000,000 USD)',
   })
   @IsNumber()
@@ -150,24 +136,21 @@ export class CreateProjectDocumentDto {
   fileName: string;
 
   @ApiProperty({
-    description: 'List of file URLs (PDFs, images, etc.)',
-    example: [
-      'https://example.com/uploads/legal-doc-1.pdf',
-      'https://example.com/uploads/legal-doc-2.jpg',
-    ],
-    type: [String],
-  })
-  @IsArray()
-  @IsNotEmpty()
-  files: string[];
-
-  @ApiProperty({
-    description: 'Document type (used for categorization)',
-    example: 'legal',
+    description: ' file URL (PDFs, images, etc.)',
+    example: 'https://example.com/uploads/legal-doc-1.pdf',
   })
   @IsString()
   @IsNotEmpty()
-  type: string;
+  files: string;
+
+  @ApiProperty({
+    description: 'Document type',
+    enum: ProjectDocumentType,
+    default: ProjectDocumentType,
+    example: ProjectDocumentType.PROJECT_DETAIL,
+  })
+  @IsEnum(ProjectDocumentType)
+  type: ProjectDocumentType;
 
   @ApiProperty({
     description: 'Document verification status',
@@ -196,12 +179,13 @@ export class CreateProjectTagDto {
 }
 
 export class CreateFieldReviewDto {
-  @ApiProperty()
-  @IsString()
-  fieldName: string;
+  @ApiProperty({
+    enum: FieldNameEnum,
+    description: 'fieldName',
+  })
+  @IsEnum(FieldNameEnum)
+  fieldName: FieldNameEnum;
 
-  @ApiProperty()
-  @IsString()
   @ApiProperty({
     enum: ProjectFieldReviewEnum,
     example: ProjectFieldReviewEnum.PENDING,
@@ -264,7 +248,7 @@ export class CreateProjectDto {
     description: 'Project scale (sqm)',
   })
   @IsOptional()
-  @IsNumber()
+  @IsString()
   projectScale?: string;
 
   @ApiProperty({ example: 'Vacation homes for investors', required: false })
@@ -320,9 +304,9 @@ export class CreateProjectDto {
   @Type(() => CreateProjectTagDto)
   tags?: CreateProjectTagDto[];
 
-  @ApiProperty({ type: [CreateFieldReviewDto], required: false })
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => CreateFieldReviewDto)
-  fieldReviews?: CreateFieldReviewDto[];
+  // @ApiProperty({ type: [CreateFieldReviewDto], required: false })
+  // @IsOptional()
+  // @ValidateNested({ each: true })
+  // @Type(() => CreateFieldReviewDto)
+  // fieldReviews?: CreateFieldReviewDto[];
 }

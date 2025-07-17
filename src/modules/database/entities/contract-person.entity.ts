@@ -1,6 +1,6 @@
 import { BaseEntity } from '@modules/database/entities/base.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity('contact_person')
 export class ContactPersonEntity extends BaseEntity {
@@ -17,5 +17,6 @@ export class ContactPersonEntity extends BaseEntity {
   position: string;
 
   @OneToOne(() => ProjectEntity, (project) => project.contactPerson)
+  @JoinColumn()
   project: ProjectEntity;
 }
