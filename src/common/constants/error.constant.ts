@@ -11,4 +11,5 @@ export enum ErrorCode {
   EMAIL_TEMPLATE_NOT_FOUND = 'Email template not found.',
   INVALID_OTP = 'Invalid OTP.',
   ACCOUNT_HAS_NOT_KYC = 'You need KYC before using.',
+  PROJECT_NOT_FOUND = 'Project not found.',
 }

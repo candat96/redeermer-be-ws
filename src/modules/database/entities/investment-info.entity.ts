@@ -13,13 +13,13 @@ export class InvestmentInfoEntity extends BaseEntity {
   @Column({ type: 'float' })
   pricePerUnit: number;
 
-  @Column()
+  @Column({ type: Number })
   totalUnits: number;
 
-  @Column()
+  @Column({ type: Number })
   minUnits: number;
 
-  @Column()
+  @Column({ type: Number })
   maxUnits: number;
 
   @OneToOne(() => ProjectEntity, (project) => project.investmentInfo)

@@ -178,6 +178,7 @@ export class CreateProjectTagDto {
 export class CreateProjectDto {
   @ApiProperty({ example: 'Sunrise Villas', description: 'Project name' })
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiProperty({ example: 'High-end beachfront villas', required: false })

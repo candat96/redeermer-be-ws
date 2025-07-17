@@ -1,3 +1,4 @@
+import { ErrorCode } from '@common/constants/error.constant';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
 import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
@@ -5,7 +6,8 @@ import { ProjectDocumentEntity } from '@modules/database/entities/project-docume
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { CreateProjectDto } from '@modules/project/dto/create-project.dto';
-import { Injectable } from '@nestjs/common';
+import { UpdateProjectDto } from '@modules/project/dto/update-project.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
@@ -83,5 +85,70 @@ export class ProjectService {
         return true;
       },
     );
+  }
+
+  async updateProject(id: string, dto: UpdateProjectDto) {
+    const project = await this.projectRepository.findOne({
+      where: { id },
+      relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
+    });
+
+    if (!project) {
+      throw new NotFoundException(ErrorCode.PROJECT_NOT_FOUND);
+    }
+
+    await this.projectRepository.manager.transaction(async (manager) => {
+      if (project.detail) {
+        manager.merge(ProjectDetailEntity, project.detail, dto.detail);
+        await manager.save(project.detail);
+      }
+
+      if (project.investmentInfo) {
+        manager.merge(
+          InvestmentInfoEntity,
+          project.investmentInfo,
+          dto.investmentInfo,
+        );
+        await manager.save(project.investmentInfo);
+      }
+
+      if (project.contactPerson) {
+        manager.merge(ContactPersonEntity, project.contactPerson, dto.contactPerson);
+        await manager.save(project.contactPerson);
+      }
+
+      if (project.document) {
+        manager.merge(ProjectDocumentEntity, project.document, dto.documents);
+        await manager.save(project.document);
+      }
+
+      if (dto.tags) {
+        await manager.softDelete(ProjectTagEntity, { project: { id: project.id } });
+
+        const newTags = dto.tags.map((tag) =>
+          this.projectTagRepository.create({ ...tag, project }),
+        );
+        await manager.save(ProjectTagEntity, newTags);
+
+        project.tags = newTags;
+      }
+
+      manager.merge(ProjectEntity, project, {
+        ...dto,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+      });
+
+      await manager.save(project);
+    });
+
+    return true;
+  }
+
+  async findOne(id: string) {
+    return await this.projectRepository.findOne({
+      where: { id },
+      relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
+    });
   }
 }
