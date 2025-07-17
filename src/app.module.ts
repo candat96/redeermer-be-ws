@@ -3,6 +3,7 @@ import { Config } from '@config/config';
 import { ApiLoggerMiddleware } from '@middlewares/logger.middleware';
 import { AuthenticationModule } from '@modules/authentication/authentication.module';
 import { DatabaseModule } from '@modules/database/database.module';
+import { PaymentModule } from '@modules/payment/payment.module';
 import { ProjectModule } from '@modules/project/project.module';
 import { UserModule } from '@modules/user/user.module';
 import { UserDocumentModule } from '@modules/user-document/user-document.module';
@@ -23,6 +24,7 @@ import { AppController } from './app.controller';
     CacheModule.register({
       isGlobal: true,
     }),
+    PaymentModule,
     UserModule,
     WhitelistEmailModule,
     UserDocumentModule,
