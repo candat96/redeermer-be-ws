@@ -1,18 +1,18 @@
 import { ProjectDocumentVerifyStatusEnum } from '@common/constants/enum/project-document.enum';
-import { UserDocumentVerifyStatusEnum } from '@common/constants/enum/user-document.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { UserEntity } from '@modules/database/entities/user.entity';
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity('project_documents')
 export class ProjectDocumentEntity extends BaseEntity {
-  @Column()
+  @Column({ type: String, nullable: false })
   fileName: string;
 
-  @Column()
-  fileUrl: string;
+  @Column({ type: 'simple-array', nullable: false, default: [] })
+  files: string[];
 
-  @Column()
+  @Column({ type: String, nullable: false })
   type: string;
 
   @Column({
@@ -20,8 +20,17 @@ export class ProjectDocumentEntity extends BaseEntity {
     enum: ProjectDocumentVerifyStatusEnum,
     default: ProjectDocumentVerifyStatusEnum.PENDING,
   })
-  status: UserDocumentVerifyStatusEnum;
+  status: ProjectDocumentVerifyStatusEnum;
 
-  @ManyToOne(() => ProjectEntity, (project) => project.documents)
+  @Column({ type: String, nullable: true })
+  note?: string;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  verifiedAt?: Date;
+
+  @ManyToOne(() => UserEntity, { nullable: true })
+  verifiedBy?: UserEntity;
+
+  @OneToOne(() => ProjectEntity, (doc) => doc.document)
   project: ProjectEntity;
 }

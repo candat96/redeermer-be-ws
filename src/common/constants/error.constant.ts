@@ -13,4 +13,5 @@ export enum ErrorCode {
   ACCOUNT_HAS_NOT_KYC = 'You need KYC before using.',
   GET_PAYPAL_ACCESS_TOKEN_FAILED = 'Get PayPal access token failed.',
   CREATE_PAYPAL_CHECKOUT_ORDER_FAILED = 'Create PayPal checkout order failed.',
+  PROJECT_NOT_FOUND = 'Project not found.',
 }

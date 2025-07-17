@@ -4,6 +4,7 @@ import { ApiLoggerMiddleware } from '@middlewares/logger.middleware';
 import { AuthenticationModule } from '@modules/authentication/authentication.module';
 import { DatabaseModule } from '@modules/database/database.module';
 import { PaymentModule } from '@modules/payment/payment.module';
+import { ProjectModule } from '@modules/project/project.module';
 import { UserModule } from '@modules/user/user.module';
 import { UserDocumentModule } from '@modules/user-document/user-document.module';
 import { WhitelistEmailModule } from '@modules/whitelist-email/whitelist-email.module';
@@ -27,6 +28,7 @@ import { AppController } from './app.controller';
     UserModule,
     WhitelistEmailModule,
     UserDocumentModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [WinstonLoggerService],

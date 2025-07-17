@@ -1,3 +1,8 @@
+import {
+  ProjectSaleStatusEnum,
+  ProjectType,
+  ProjectVerifiedStatus,
+} from '@common/constants/enum/project.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
@@ -8,35 +13,55 @@ import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 
 @Entity('project')
 export class ProjectEntity extends BaseEntity {
-  @Column()
+  @Column({ type: String, nullable: false })
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: String, nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column({ type: String, nullable: true })
   developer: string;
 
-  @Column()
-  propertyType: string;
+  @Column({
+    type: 'enum',
+    enum: ProjectType,
+    nullable: false,
+  })
+  propertyType: ProjectType;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectVerifiedStatus,
+    nullable: false,
+    default: ProjectVerifiedStatus.PENDING,
+  })
+  verifiedStatus: ProjectVerifiedStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectSaleStatusEnum,
+    nullable: false,
+    default: ProjectSaleStatusEnum.PENDING,
+  })
+  projectSaleStatus: ProjectSaleStatusEnum;
 
   @Column({ type: 'float', nullable: true })
   projectScale: number;
 
-  @Column({ nullable: true })
+  @Column({ type: String, nullable: true })
   objective: string;
 
-  @Column({ nullable: true })
+  @Column({ type: String, nullable: true })
   advantages: string;
 
-  @Column()
+  @Column({ type: String, nullable: true })
   location: string;
 
-  @Column({ type: 'float', nullable: true })
-  latitude: number;
+  @Column({ type: String, nullable: true })
+  latitude: string;
 
-  @Column({ type: 'float', nullable: true })
-  longitude: number;
+  @Column({ type: String, nullable: true })
+  longitude: string;
 
   @OneToOne(() => ProjectDetailEntity, (detail) => detail.project, { cascade: true })
   detail: ProjectDetailEntity;
@@ -49,9 +74,9 @@ export class ProjectEntity extends BaseEntity {
   })
   contactPerson: ContactPersonEntity;
 
-  @OneToMany(() => ProjectDocumentEntity, (doc) => doc.project, { cascade: true })
-  documents: ProjectDocumentEntity[];
+  @OneToOne(() => ProjectDocumentEntity, (doc) => doc.project, { cascade: true })
+  document: ProjectDocumentEntity;
 
-  @OneToMany(() => ProjectDocumentEntity, (tag) => tag.project, { cascade: true })
+  @OneToMany(() => ProjectTagEntity, (tag) => tag.project, { cascade: true })
   tags: ProjectTagEntity[];
 }
