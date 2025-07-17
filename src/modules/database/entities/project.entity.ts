@@ -9,6 +9,7 @@ import { InvestmentInfoEntity } from '@modules/database/entities/investment-info
 import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 
 @Entity('project')
@@ -16,7 +17,7 @@ export class ProjectEntity extends BaseEntity {
   @Column({ type: String, nullable: false })
   name: string;
 
-  @Column({ type: String, nullable: true })
+  @Column({ type: String, nullable: false })
   description: string;
 
   @Column({ type: String, nullable: true })
@@ -45,8 +46,8 @@ export class ProjectEntity extends BaseEntity {
   })
   projectSaleStatus: ProjectSaleStatusEnum;
 
-  @Column({ type: 'float', nullable: true })
-  projectScale: number;
+  @Column({ type: String, nullable: false })
+  projectScale: string;
 
   @Column({ type: String, nullable: true })
   objective: string;
@@ -54,13 +55,13 @@ export class ProjectEntity extends BaseEntity {
   @Column({ type: String, nullable: true })
   advantages: string;
 
-  @Column({ type: String, nullable: true })
+  @Column({ type: String, nullable: false })
   location: string;
 
-  @Column({ type: String, nullable: true })
+  @Column({ type: String, nullable: false })
   latitude: string;
 
-  @Column({ type: String, nullable: true })
+  @Column({ type: String, nullable: false })
   longitude: string;
 
   @OneToOne(() => ProjectDetailEntity, (detail) => detail.project, { cascade: true })
@@ -74,9 +75,14 @@ export class ProjectEntity extends BaseEntity {
   })
   contactPerson: ContactPersonEntity;
 
-  @OneToOne(() => ProjectDocumentEntity, (doc) => doc.project, { cascade: true })
-  document: ProjectDocumentEntity;
+  @OneToMany(() => ProjectDocumentEntity, (doc) => doc.project, { cascade: true })
+  document: ProjectDocumentEntity[];
 
   @OneToMany(() => ProjectTagEntity, (tag) => tag.project, { cascade: true })
   tags: ProjectTagEntity[];
+
+  @OneToMany(() => ProjectFieldReviewEntity, (field) => field.project, {
+    cascade: true,
+  })
+  fieldReviews: ProjectFieldReviewEntity[];
 }
