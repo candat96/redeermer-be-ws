@@ -5,7 +5,9 @@ import { ProjectDetailEntity } from '@modules/database/entities/project-detail.e
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { CreateProjectDto } from '@modules/project/dto/create-project.dto';
+import { FindAllProjectDto } from '@modules/project/dto/find-all-project.dto';
 import { UpdateProjectDto } from '@modules/project/dto/update-project.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,6 +28,8 @@ export class ProjectService {
     private readonly projectDocumentRepository: Repository<ProjectDocumentEntity>,
     @InjectRepository(ProjectTagEntity)
     private readonly projectTagRepository: Repository<ProjectTagEntity>,
+    @InjectRepository(ProjectFieldReviewEntity)
+    private readonly projectFileReviewRepository: Repository<ProjectFieldReviewEntity>,
   ) {}
 
   async createProject(dto: CreateProjectDto) {
@@ -47,6 +51,7 @@ export class ProjectService {
       minUnits: dto.investmentInfo.minUnits,
       maxUnits: dto.investmentInfo.maxUnits,
     });
+
     const contact = this.contractRepository.create({
       fullName: dto.contactPerson.fullName,
       phone: dto.contactPerson.phone,
@@ -54,13 +59,15 @@ export class ProjectService {
       position: dto.contactPerson.position,
     });
 
-    const document = this.projectDocumentRepository.create({
-      fileName: dto.documents.fileName,
-      files: dto.documents.files,
-      type: dto.documents.type,
-      status: dto.documents.status,
-      note: dto.documents.note,
-    });
+    const document = dto.documents.map((d) =>
+      this.projectDocumentRepository.create({
+        fileName: d.fileName,
+        files: d.files,
+        type: d.type,
+        note: d.note,
+        status: d.status,
+      }),
+    );
 
     const tags = dto.tags?.map((t) => this.projectTagRepository.create(t)) || [];
 
@@ -117,9 +124,12 @@ export class ProjectService {
         await manager.save(project.contactPerson);
       }
 
-      if (project.document) {
-        manager.merge(ProjectDocumentEntity, project.document, dto.documents);
-        await manager.save(project.document);
+      if (dto.documents?.length) {
+        const updateDocs = dto.documents.map((document) =>
+          this.projectDocumentRepository.create({ ...document, project }),
+        );
+
+        await manager.save(ProjectDocumentEntity, updateDocs);
       }
 
       if (dto.tags) {
@@ -150,5 +160,25 @@ export class ProjectService {
       where: { id },
       relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
     });
+  }
+
+  async findAllMyProject(query: FindAllProjectDto) {
+    console.log(query);
+    const project = await this.projectRepository.find();
+
+    return {
+      data: project,
+      pagination: null,
+    };
+  }
+
+  async findAllInvestment(query: FindAllProjectDto) {
+    console.log(query);
+    const project = await this.projectRepository.find();
+
+    return {
+      data: project,
+      pagination: null,
+    };
   }
 }

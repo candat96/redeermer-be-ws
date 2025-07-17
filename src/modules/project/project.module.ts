@@ -4,6 +4,7 @@ import { ProjectDetailEntity } from '@modules/database/entities/project-detail.e
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProjectController } from './project.controller';
@@ -18,6 +19,7 @@ import { ProjectService } from './project.service';
       InvestmentInfoEntity,
       ProjectDocumentEntity,
       ProjectTagEntity,
+      ProjectFieldReviewEntity,
     ]),
   ],
   controllers: [ProjectController],

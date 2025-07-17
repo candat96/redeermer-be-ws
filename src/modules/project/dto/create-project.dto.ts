@@ -1,4 +1,9 @@
+import {
+  CurrentStatus,
+  LegalStatus,
+} from '@common/constants/enum/project-detail.enum';
 import { ProjectDocumentVerifyStatusEnum } from '@common/constants/enum/project-document.enum';
+import { ProjectFieldReviewEnum } from '@common/constants/enum/project-field-review.enum';
 import {
   ProjectSaleStatusEnum,
   ProjectType,
@@ -18,17 +23,22 @@ import {
 } from 'class-validator';
 
 export class CreateProjectDetailDto {
-  @ApiProperty({ example: 1200.5, description: 'Total area in square meters' })
+  @ApiProperty({ example: '1200.5', description: 'Total area in square meters' })
   @IsNumber()
-  area: number;
+  area: string;
 
   @ApiProperty({ example: 10, description: 'Number of floors' })
   @IsNumber()
   numberOfFloors: number;
 
-  @ApiProperty({ example: 'Under Construction', description: 'Current status' })
-  @IsString()
-  currentStatus: string;
+  @ApiProperty({
+    description: 'Under Construction',
+    enum: CurrentStatus,
+    default: CurrentStatus.COMPLETE,
+    example: CurrentStatus.COMPLETE,
+  })
+  @IsEnum(CurrentStatus)
+  currentStatus?: CurrentStatus;
 
   @ApiProperty({
     example: '2026-06-30',
@@ -39,9 +49,14 @@ export class CreateProjectDetailDto {
   @IsDateString()
   estimatedCompletionTime?: Date;
 
-  @ApiProperty({ example: 'Legal title obtained', description: 'Legal status' })
-  @IsString()
-  legalStatus: string;
+  @ApiProperty({
+    description: 'Legal status',
+    enum: LegalStatus,
+    default: LegalStatus.NOT_VERIFIED,
+    example: LegalStatus.NOT_VERIFIED,
+  })
+  @IsEnum(LegalStatus)
+  legalStatus?: LegalStatus;
 
   @ApiProperty({
     example: ['https://example.com/image1.jpg'],
@@ -180,6 +195,27 @@ export class CreateProjectTagDto {
   name: string;
 }
 
+export class CreateFieldReviewDto {
+  @ApiProperty()
+  @IsString()
+  fieldName: string;
+
+  @ApiProperty()
+  @IsString()
+  @ApiProperty({
+    enum: ProjectFieldReviewEnum,
+    example: ProjectFieldReviewEnum.PENDING,
+    description: 'verified status',
+  })
+  @IsEnum(ProjectFieldReviewEnum)
+  status: ProjectFieldReviewEnum;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  reviewerComment?: string;
+}
+
 export class CreateProjectDto {
   @ApiProperty({ example: 'Sunrise Villas', description: 'Project name' })
   @IsString()
@@ -223,13 +259,13 @@ export class CreateProjectDto {
   saleStatus: ProjectSaleStatusEnum;
 
   @ApiProperty({
-    example: 10000,
+    example: '10000',
     required: false,
     description: 'Project scale (sqm)',
   })
   @IsOptional()
   @IsNumber()
-  projectScale?: number;
+  projectScale?: string;
 
   @ApiProperty({ example: 'Vacation homes for investors', required: false })
   @IsOptional()
@@ -273,14 +309,20 @@ export class CreateProjectDto {
   @Type(() => CreateContactPersonDto)
   contactPerson: CreateContactPersonDto;
 
-  @ApiProperty({ type: CreateProjectDocumentDto, required: true })
-  @ValidateNested()
+  @ApiProperty({ type: [CreateProjectDocumentDto], required: true })
+  @ValidateNested({ each: true })
   @Type(() => CreateProjectDocumentDto)
-  documents?: CreateProjectDocumentDto;
+  documents?: CreateProjectDocumentDto[];
 
   @ApiProperty({ type: [CreateProjectTagDto], required: false })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateProjectTagDto)
   tags?: CreateProjectTagDto[];
+
+  @ApiProperty({ type: [CreateFieldReviewDto], required: false })
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateFieldReviewDto)
+  fieldReviews?: CreateFieldReviewDto[];
 }

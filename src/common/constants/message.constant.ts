@@ -16,4 +16,6 @@ export enum ApiMessageKey {
   CREATE_CHECKOUT_LINK_SUCCESS = 'Create checkout link successfully.',
   RECEIVE_CHECKOUT_WEBHOOKS_SUCCESS = 'Receiving checkout webhook successfully.',
   CREATE_PROJECT_SUCCESS = 'Create project successfully.',
+  GET_ALL_PROJECT_INVESTMENT = 'Get all projects for investment successfully.',
+  GET_ALL_PROJECT_LEGAL_PERSON = 'Get all projects for legal person successfully.',
 }

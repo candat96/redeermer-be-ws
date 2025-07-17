@@ -42,15 +42,25 @@ export class ProjectController {
   }
 
   @Get('investment')
-  async findAllProjects(@Query() query: FindAllProjectDto) {
-    console.log(query);
-    return 'data';
+  async findAllInvestment(@Query() query: FindAllProjectDto) {
+    const { data, pagination } = await this.projectService.findAllInvestment(query);
+    return new ApiResponseDto<boolean>({
+      statusCode: HttpStatus.OK,
+      data: data,
+      message: ApiMessageKey.GET_ALL_PROJECT_INVESTMENT,
+      pagination: pagination,
+    });
   }
 
   @Get()
-  async findAllMyProjects(@Query() query: FindAllProjectDto) {
-    console.log(query);
-    return 'data';
+  async findAllMyProject(@Query() query: FindAllProjectDto) {
+    const { data, pagination } = await this.projectService.findAllMyProject(query);
+    return new ApiResponseDto<boolean>({
+      statusCode: HttpStatus.OK,
+      data: data,
+      message: ApiMessageKey.GET_ALL_PROJECT_LEGAL_PERSON,
+      pagination: pagination,
+    });
   }
 
   @Patch(':id')
