@@ -1,4 +1,3 @@
-import { RangeDateRequestDto } from '@common/classes/request.dto';
 import {
   ProjectSaleStatusEnum,
   ProjectType,
@@ -11,42 +10,8 @@ import { ProjectDocumentEntity } from '@modules/database/entities/project-docume
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
-import { UserEntity } from '@modules/database/entities/user.entity';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
 
-export class FindAllProjectDto extends RangeDateRequestDto {
-  @ApiProperty({
-    enum: ProjectType,
-    description: 'Type of the project (e.g., Residential, Commercial, etc.)',
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(ProjectType)
-  propertyType: ProjectType;
-
-  @ApiProperty({
-    enum: ProjectVerifiedStatus,
-    description:
-      'Verification status of the project (e.g., PENDING, APPROVED, REJECTED)',
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(ProjectVerifiedStatus)
-  projectVerifiedStatus: ProjectVerifiedStatus;
-
-  @ApiProperty({
-    enum: ProjectSaleStatusEnum,
-    description:
-      'Sale status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(ProjectSaleStatusEnum)
-  saleStatus: ProjectSaleStatusEnum;
-}
-
-export class FindAllProjectResponseDto {
+export class FindOneProjectResponseDto {
   id: string;
   name: string;
   description: string;
@@ -67,7 +32,6 @@ export class FindAllProjectResponseDto {
   document: ProjectDocumentEntity[];
   tags: ProjectTagEntity[];
   fieldReviews: ProjectFieldReviewEntity[];
-  owner: UserEntity;
 
   constructor(project: ProjectEntity) {
     this.id = project.id;
@@ -90,6 +54,5 @@ export class FindAllProjectResponseDto {
     this.document = project.document;
     this.tags = project.tags;
     this.fieldReviews = project.fieldReviews;
-    this.owner = project.owner;
   }
 }

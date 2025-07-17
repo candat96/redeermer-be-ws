@@ -10,7 +10,8 @@ import { ProjectDetailEntity } from '@modules/database/entities/project-detail.e
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { UserEntity } from '@modules/database/entities/user.entity';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 @Entity('project')
 export class ProjectEntity extends BaseEntity {
@@ -85,4 +86,7 @@ export class ProjectEntity extends BaseEntity {
     cascade: true,
   })
   fieldReviews: ProjectFieldReviewEntity[];
+
+  @ManyToOne(() => UserEntity, (user) => user.projects, { nullable: false })
+  owner: UserEntity;
 }

@@ -1,3 +1,8 @@
+import { PaginatedResponse } from '@common/classes/response.dto';
+import {
+  FieldNameEnum,
+  ProjectFieldReviewEnum,
+} from '@common/constants/enum/project-field-review.enum';
 import { ErrorCode } from '@common/constants/error.constant';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
@@ -6,12 +11,17 @@ import { ProjectDocumentEntity } from '@modules/database/entities/project-docume
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
+import { UserEntity } from '@modules/database/entities/user.entity';
 import { CreateProjectDto } from '@modules/project/dto/create-project.dto';
-import { FindAllProjectDto } from '@modules/project/dto/find-all-project.dto';
+import {
+  FindAllProjectDto,
+  FindAllProjectResponseDto,
+} from '@modules/project/dto/find-all-project.dto';
+import { FindOneProjectResponseDto } from '@modules/project/dto/find-one-project.dto';
 import { UpdateProjectDto } from '@modules/project/dto/update-project.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class ProjectService {
@@ -32,63 +42,94 @@ export class ProjectService {
     private readonly projectFileReviewRepository: Repository<ProjectFieldReviewEntity>,
   ) {}
 
-  async createProject(dto: CreateProjectDto) {
-    const detail = this.projectDetailRepository.create({
-      area: dto.detail.area,
-      numberOfFloors: dto.detail.numberOfFloors,
-      currentStatus: dto.detail.currentStatus,
-      estimatedCompletionTime: dto.detail.estimatedCompletionTime,
-      legalStatus: dto.detail.legalStatus,
-      mediaUrls: dto.detail.mediaUrls,
-      floorPlanUrl: dto.detail.floorPlanUrl,
-    });
-
-    const investmentInfo = this.investmentInfoRepository.create({
-      proposedValue: dto.investmentInfo.proposedValue,
-      appraisedValue: dto.investmentInfo.appraisedValue,
-      pricePerUnit: dto.investmentInfo.pricePerUnit,
-      totalUnits: dto.investmentInfo.totalUnits,
-      minUnits: dto.investmentInfo.minUnits,
-      maxUnits: dto.investmentInfo.maxUnits,
-    });
-
-    const contact = this.contractRepository.create({
-      fullName: dto.contactPerson.fullName,
-      phone: dto.contactPerson.phone,
-      email: dto.contactPerson.email,
-      position: dto.contactPerson.position,
-    });
-
-    const document = dto.documents.map((d) =>
-      this.projectDocumentRepository.create({
-        fileName: d.fileName,
-        files: d.files,
-        type: d.type,
-        note: d.note,
-        status: d.status,
-      }),
-    );
-
-    const tags = dto.tags?.map((t) => this.projectTagRepository.create(t)) || [];
-
+  async createProject(dto: CreateProjectDto, userId: string) {
     await this.projectRepository.manager.transaction(
       async (manager: EntityManager) => {
-        const savedDetail = await manager.save(detail);
-        const savedInvestment = await manager.save(investmentInfo);
-        const savedContact = await manager.save(contact);
-        const savedDocument = await manager.save(document);
-        const savedTags = await manager.save(tags);
-
         const project = manager.create(ProjectEntity, {
-          ...dto,
-          detail: savedDetail,
-          investmentInfo: savedInvestment,
-          contactPerson: savedContact,
-          document: savedDocument,
-          tags: savedTags,
+          name: dto.name,
+          description: dto.description,
+          developer: dto.developer,
+          propertyType: dto.propertyType,
+          projectVerifiedStatus: dto.projectVerifiedStatus,
+          saleStatus: dto.saleStatus,
+          projectScale: dto.projectScale,
+          objective: dto.objective,
+          advantages: dto.advantages,
+          location: dto.location,
+          latitude: dto.latitude,
+          longitude: dto.longitude,
+          owner: manager.create(UserEntity, { id: userId }),
         });
 
         await manager.insert(ProjectEntity, project);
+
+        const detail = manager.create(ProjectDetailEntity, {
+          area: dto.detail.area,
+          numberOfFloors: dto.detail.numberOfFloors,
+          currentStatus: dto.detail.currentStatus,
+          estimatedCompletionTime: dto.detail.estimatedCompletionTime,
+          legalStatus: dto.detail.legalStatus,
+          project: manager.create(ProjectEntity, { id: project.id }),
+        });
+
+        await manager.insert(ProjectDetailEntity, detail);
+
+        const investmentInfo = manager.create(InvestmentInfoEntity, {
+          proposedValue: dto.investmentInfo.proposedValue,
+          appraisedValue: dto.investmentInfo.appraisedValue,
+          pricePerUnit: dto.investmentInfo.pricePerUnit,
+          totalUnits: dto.investmentInfo.totalUnits,
+          minUnits: dto.investmentInfo.minUnits,
+          maxUnits: dto.investmentInfo.maxUnits,
+          project: manager.create(ProjectEntity, { id: project.id }),
+        });
+
+        await manager.insert(InvestmentInfoEntity, investmentInfo);
+
+        const contact = manager.create(ContactPersonEntity, {
+          fullName: dto.contactPerson.fullName,
+          phone: dto.contactPerson.phone,
+          email: dto.contactPerson.email,
+          position: dto.contactPerson.position,
+          project: manager.create(ProjectEntity, { id: project.id }),
+        });
+        await manager.insert(ContactPersonEntity, contact);
+
+        const document = dto.documents.map((d) =>
+          manager.create(ProjectDocumentEntity, {
+            fileName: d.fileName,
+            files: d.files,
+            type: d.type,
+            note: d.note,
+            status: d.status,
+            project: manager.create(ProjectEntity, { id: project.id }),
+          }),
+        );
+
+        await manager.insert(ProjectDocumentEntity, document);
+
+        const tags =
+          dto.tags?.map((t) =>
+            manager.create(ProjectTagEntity, {
+              ...t,
+              project: manager.create(ProjectEntity, { id: project.id }),
+            }),
+          ) || [];
+
+        await manager.insert(ProjectTagEntity, tags);
+
+        const fieldNameArray = Object.values(FieldNameEnum);
+
+        const fieldName = fieldNameArray.map((fa) =>
+          manager.create(ProjectFieldReviewEntity, {
+            fieldName: fa,
+            status: ProjectFieldReviewEnum.PENDING,
+            project: manager.create(ProjectEntity, { id: project.id }),
+          }),
+        );
+
+        await manager.insert(ProjectFieldReviewEntity, fieldName);
+
         return true;
       },
     );
@@ -156,29 +197,53 @@ export class ProjectService {
   }
 
   async findOne(id: string) {
-    return await this.projectRepository.findOne({
+    const project = await this.projectRepository.findOne({
       where: { id },
       relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
     });
+
+    return new FindOneProjectResponseDto(project);
   }
 
-  async findAllMyProject(query: FindAllProjectDto) {
-    console.log(query);
-    const project = await this.projectRepository.find();
+  async findAllProject(query: FindAllProjectDto) {
+    const [data, total] = await this.projectRepository.findAndCount({
+      where: {
+        name: query.search ? ILike(`%${query.search}%`) : undefined,
+        verifiedStatus: query.projectVerifiedStatus ?? undefined,
+      },
+      take: !query.getAll ? query.limit : undefined,
+      skip: !query.getAll ? query.offset : undefined,
+      order: { createdAt: query.order },
+    });
 
-    return {
-      data: project,
-      pagination: null,
-    };
+    return new PaginatedResponse<FindAllProjectResponseDto>(
+      data.map((item) => new FindAllProjectResponseDto(item)),
+      {
+        page: query.page,
+        limit: query.limit,
+        total: total,
+      },
+    );
   }
 
-  async findAllInvestment(query: FindAllProjectDto) {
-    console.log(query);
-    const project = await this.projectRepository.find();
+  async findAllInvestment(query: FindAllProjectDto, userId: string) {
+    const [data, total] = await this.projectRepository.findAndCount({
+      where: {
+        name: query.search ? ILike(`%${query.search}%`) : undefined,
+        owner: { id: userId },
+      },
+      take: !query.getAll ? query.limit : undefined,
+      skip: !query.getAll ? query.offset : undefined,
+      order: { createdAt: query.order },
+    });
 
-    return {
-      data: project,
-      pagination: null,
-    };
+    return new PaginatedResponse<FindAllProjectResponseDto>(
+      data.map((item) => new FindAllProjectResponseDto(item)),
+      {
+        page: query.page,
+        limit: query.limit,
+        total: total,
+      },
+    );
   }
 }

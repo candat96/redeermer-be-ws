@@ -1,7 +1,7 @@
 import { BaseEntity, NumberColumn } from '@modules/database/entities/base.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import BigNumber from 'bignumber.js';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity('investment_info')
 export class InvestmentInfoEntity extends BaseEntity {
@@ -24,5 +24,6 @@ export class InvestmentInfoEntity extends BaseEntity {
   maxUnits: number;
 
   @OneToOne(() => ProjectEntity, (project) => project.investmentInfo)
+  @JoinColumn()
   project: ProjectEntity;
 }

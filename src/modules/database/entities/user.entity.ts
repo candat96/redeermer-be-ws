@@ -5,6 +5,7 @@ import {
   UserStatus,
 } from '@common/constants/enum/user.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
+import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { UserDocumentEntity } from '@modules/database/entities/user-document.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
@@ -54,6 +55,9 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'enum', enum: KycStatus, default: KycStatus.UNVERIFIED })
   kycStatus: KycStatus;
 
-  @OneToMany(() => UserDocumentEntity, (doc) => doc.user)
+  @OneToMany(() => ProjectEntity, (project) => project.owner)
+  projects: ProjectEntity[];
+
+  @OneToMany(() => UserDocumentEntity, (docs) => docs.user)
   documents: UserDocumentEntity[];
 }
