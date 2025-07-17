@@ -1,9 +1,14 @@
 import { WinstonLoggerService } from '@common/services/winston.service';
 import { Config } from '@config/config';
 import { ApiLoggerMiddleware } from '@middlewares/logger.middleware';
-import { AuthModule } from '@modules/authentication/authentication.module';
+import { AuthenticationModule } from '@modules/authentication/authentication.module';
 import { DatabaseModule } from '@modules/database/database.module';
+import { PaymentModule } from '@modules/payment/payment.module';
+import { ProjectModule } from '@modules/project/project.module';
 import { UserModule } from '@modules/user/user.module';
+import { UserDocumentModule } from '@modules/user-document/user-document.module';
+import { WhitelistEmailModule } from '@modules/whitelist-email/whitelist-email.module';
+import { CacheModule } from '@nestjs/cache-manager';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
@@ -14,9 +19,16 @@ import { AppController } from './app.controller';
       secret: Config.JWT_SECRET,
       signOptions: { expiresIn: '120s' },
     }),
-    AuthModule,
+    AuthenticationModule,
     DatabaseModule,
+    CacheModule.register({
+      isGlobal: true,
+    }),
+    PaymentModule,
     UserModule,
+    WhitelistEmailModule,
+    UserDocumentModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [WinstonLoggerService],
