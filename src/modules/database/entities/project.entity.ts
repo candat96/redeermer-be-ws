@@ -1,3 +1,8 @@
+import {
+  ProjectSaleStatusEnum,
+  ProjectType,
+  ProjectVerifiedStatus,
+} from '@common/constants/enum/project.enum';
 import { BaseEntity } from '@modules/database/entities/base.entity';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
@@ -17,8 +22,28 @@ export class ProjectEntity extends BaseEntity {
   @Column({ type: String, nullable: true })
   developer: string;
 
-  @Column({ type: String, nullable: true })
-  propertyType: string;
+  @Column({
+    type: 'enum',
+    enum: ProjectType,
+    nullable: false,
+  })
+  propertyType: ProjectType;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectVerifiedStatus,
+    nullable: false,
+    default: ProjectVerifiedStatus.PENDING,
+  })
+  verifiedStatus: ProjectVerifiedStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectSaleStatusEnum,
+    nullable: false,
+    default: ProjectSaleStatusEnum.PENDING,
+  })
+  projectSaleStatus: ProjectSaleStatusEnum;
 
   @Column({ type: 'float', nullable: true })
   projectScale: number;

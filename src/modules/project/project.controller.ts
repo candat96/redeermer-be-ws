@@ -41,8 +41,14 @@ export class ProjectController {
     }
   }
 
+  @Get('investment')
+  async findAllProjects(@Query() query: FindAllProjectDto) {
+    console.log(query);
+    return 'data';
+  }
+
   @Get()
-  async findAllProject(@Query() query: FindAllProjectDto) {
+  async findAllMyProjects(@Query() query: FindAllProjectDto) {
     console.log(query);
     return 'data';
   }

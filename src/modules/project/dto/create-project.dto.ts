@@ -1,4 +1,9 @@
 import { ProjectDocumentVerifyStatusEnum } from '@common/constants/enum/project-document.enum';
+import {
+  ProjectSaleStatusEnum,
+  ProjectType,
+  ProjectVerifiedStatus,
+} from '@common/constants/enum/project.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -191,9 +196,31 @@ export class CreateProjectDto {
   @IsString()
   developer?: string;
 
-  @ApiProperty({ example: 'real_estate', description: 'Property type' })
-  @IsString()
-  propertyType: string;
+  @ApiProperty({
+    enum: ProjectType,
+    example: ProjectType.URBAN,
+    description: 'Type of the project (e.g., Residential, Commercial, etc.)',
+  })
+  @IsEnum(ProjectType)
+  propertyType: ProjectType;
+
+  @ApiProperty({
+    enum: ProjectVerifiedStatus,
+    example: ProjectVerifiedStatus.PENDING,
+    description:
+      'Verification status of the project (e.g., PENDING, APPROVED, REJECTED)',
+  })
+  @IsEnum(ProjectVerifiedStatus)
+  projectVerifiedStatus: ProjectVerifiedStatus;
+
+  @ApiProperty({
+    enum: ProjectSaleStatusEnum,
+    example: ProjectSaleStatusEnum.ON_SALE,
+    description:
+      'Sale status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
+  })
+  @IsEnum(ProjectSaleStatusEnum)
+  saleStatus: ProjectSaleStatusEnum;
 
   @ApiProperty({
     example: 10000,
