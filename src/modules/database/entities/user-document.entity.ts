@@ -5,7 +5,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('user_document')
 export class UserDocumentEntity extends BaseEntity {
-  @Column()
+  @Column({ type: String, nullable: false })
   name: string;
 
   @Column({ type: 'simple-array', nullable: false, default: [] })
@@ -18,13 +18,13 @@ export class UserDocumentEntity extends BaseEntity {
   })
   status: UserDocumentVerifyStatusEnum;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   verifiedAt?: Date;
 
   @ManyToOne(() => UserEntity, { nullable: true })
   verifiedBy?: UserEntity;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   note?: string;
 
   @ManyToOne(() => UserEntity, (user) => user.documents)

@@ -4,10 +4,10 @@ import { Column, Entity, OneToOne } from 'typeorm';
 
 @Entity('project_details')
 export class ProjectDetailEntity extends BaseEntity {
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: false })
   area: number;
 
-  @Column()
+  @Column({ type: Number, nullable: true })
   numberOfFloors: number;
 
   @Column()
@@ -16,13 +16,13 @@ export class ProjectDetailEntity extends BaseEntity {
   @Column({ type: 'date', nullable: true })
   estimatedCompletionTime: Date;
 
-  @Column()
+  @Column({ type: String, nullable: true })
   legalStatus: string;
 
   @Column('text', { array: true, nullable: true })
   mediaUrls: string[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   floorPlanUrl: string;
 
   @OneToOne(() => ProjectEntity, (project) => project.detail)
