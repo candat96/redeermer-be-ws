@@ -6,9 +6,8 @@ export enum UserGender {
 
 export enum UserRole {
   INVESTOR = 'INVESTOR',
-  PROJECT_MANAGER = 'PROJECT_MANAGER',
   ADMIN = 'ADMIN',
-  STAFF = 'STAFF',
+  LEGAL = 'LEGAL',
 }
 
 export enum UserStatus {
