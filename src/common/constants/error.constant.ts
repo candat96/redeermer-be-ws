@@ -14,4 +14,6 @@ export enum ErrorCode {
   GET_PAYPAL_ACCESS_TOKEN_FAILED = 'Get PayPal access token failed.',
   CREATE_PAYPAL_CHECKOUT_ORDER_FAILED = 'Create PayPal checkout order failed.',
   PROJECT_NOT_FOUND = 'Project not found.',
+  PROJECT_DOCUMENT_NOT_FOUND = 'Project document not found.',
+  FIELD_NAME_NOT_FOUND = 'Verified field name not found.',
 }

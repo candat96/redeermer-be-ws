@@ -205,11 +205,17 @@ export class ProjectService {
     return new FindOneProjectResponseDto(project);
   }
 
-  async findAllProject(query: FindAllProjectDto) {
+  async findAllInvestment(query: FindAllProjectDto, userId: string) {
     const [data, total] = await this.projectRepository.findAndCount({
       where: {
         name: query.search ? ILike(`%${query.search}%`) : undefined,
-        verifiedStatus: query.projectVerifiedStatus ?? undefined,
+        owner: { id: userId },
+      },
+      relations: {
+        investmentInfo: true,
+        detail: true,
+        contactPerson: true,
+        document: true,
       },
       take: !query.getAll ? query.limit : undefined,
       skip: !query.getAll ? query.offset : undefined,
@@ -226,24 +232,13 @@ export class ProjectService {
     );
   }
 
-  async findAllInvestment(query: FindAllProjectDto, userId: string) {
-    const [data, total] = await this.projectRepository.findAndCount({
-      where: {
-        name: query.search ? ILike(`%${query.search}%`) : undefined,
-        owner: { id: userId },
-      },
-      take: !query.getAll ? query.limit : undefined,
-      skip: !query.getAll ? query.offset : undefined,
-      order: { createdAt: query.order },
-    });
+  async delete(id: string) {
+    const project = await this.findOne(id);
+    if (!project) {
+      throw new NotFoundException(ErrorCode.PROJECT_NOT_FOUND);
+    }
 
-    return new PaginatedResponse<FindAllProjectResponseDto>(
-      data.map((item) => new FindAllProjectResponseDto(item)),
-      {
-        page: query.page,
-        limit: query.limit,
-        total: total,
-      },
-    );
+    await this.projectRepository.softDelete(id);
+    return true;
   }
 }

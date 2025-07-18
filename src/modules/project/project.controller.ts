@@ -1,7 +1,9 @@
 import { ApiResponseDto } from '@common/classes/response.dto';
+import { UserRole } from '@common/constants/enum/user.enum';
 import { ApiMessageKey } from '@common/constants/message.constant';
 import { AuthUser } from '@common/decorators/auth-user.decorator';
 import { BasicHeader } from '@common/decorators/basic-header.decorator';
+import { Roles } from '@common/decorators/roles.decorator';
 import { AuthGuard } from '@common/guards/auth.guard';
 import { RoleGuard } from '@common/guards/role.guard';
 import { CreateProjectDto } from '@modules/project/dto/create-project.dto';
@@ -14,6 +16,7 @@ import { UpdateProjectDto } from '@modules/project/dto/update-project.dto';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -24,18 +27,23 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { ProjectService } from './project.service';
 
-@BasicHeader('Product')
+@BasicHeader('Project')
 @Controller('project')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, RoleGuard)
+@Roles([UserRole.ADMIN, UserRole.INVESTOR])
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Create project',
+    description: 'Create project',
+  })
   async createProject(
     @Body() dto: CreateProjectDto,
     @AuthUser('id') userId: string,
@@ -54,6 +62,10 @@ export class ProjectController {
   }
 
   @Get('investor')
+  @ApiOperation({
+    summary: 'Get all investor project',
+    description: 'Get all investor project',
+  })
   async findAllInvestment(
     @Query() query: FindAllProjectDto,
     @AuthUser('id') userId: string,
@@ -70,29 +82,17 @@ export class ProjectController {
     });
   }
 
-  @Get('legal')
-  async findAllProject(@Query() query: FindAllProjectDto) {
-    try {
-      const { data, pagination } = await this.projectService.findAllProject(query);
-      return new ApiResponseDto<FindAllProjectResponseDto>({
-        statusCode: HttpStatus.OK,
-        data: data,
-        message: ApiMessageKey.GET_ALL_PROJECT_LEGAL_PERSON,
-        pagination: pagination,
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  }
-
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update project info',
+    description: 'Update project info',
+  })
   async updateProject(@Param('id') id: string, @Body() body: UpdateProjectDto) {
     try {
       return new ApiResponseDto<boolean>({
         statusCode: HttpStatus.OK,
         data: await this.projectService.updateProject(id, body),
-        message: ApiMessageKey.GET_DETAIL_PROJECT_SUCCESS,
+        message: ApiMessageKey.UPDATE_PROJECT_SUCCESS,
         pagination: null,
       });
     } catch (err) {
@@ -102,12 +102,35 @@ export class ProjectController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Get project detail',
+    description: 'Get project detail',
+  })
   async getProjectDetail(@Param('id') id: string) {
     try {
       return new ApiResponseDto<FindOneProjectResponseDto>({
         statusCode: HttpStatus.OK,
         data: await this.projectService.findOne(id),
         message: ApiMessageKey.GET_DETAIL_PROJECT_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    summary: 'Delete project',
+    description: 'Delete project',
+  })
+  async deleteProject(@Param('id') id: string) {
+    try {
+      return new ApiResponseDto<FindOneProjectResponseDto>({
+        statusCode: HttpStatus.OK,
+        data: await this.projectService.delete(id),
+        message: ApiMessageKey.DELETE_PROJECT_SUCCESS,
         pagination: null,
       });
     } catch (err) {

@@ -3,8 +3,10 @@ import { Config } from '@config/config';
 import { ApiLoggerMiddleware } from '@middlewares/logger.middleware';
 import { AuthenticationModule } from '@modules/authentication/authentication.module';
 import { DatabaseModule } from '@modules/database/database.module';
+import { LegalModule } from '@modules/legal/legal.module';
 import { PaymentModule } from '@modules/payment/payment.module';
 import { ProjectModule } from '@modules/project/project.module';
+import { ProjectDocumentModule } from '@modules/project-document/project-document.module';
 import { UserModule } from '@modules/user/user.module';
 import { UserDocumentModule } from '@modules/user-document/user-document.module';
 import { WhitelistEmailModule } from '@modules/whitelist-email/whitelist-email.module';
@@ -29,6 +31,8 @@ import { AppController } from './app.controller';
     WhitelistEmailModule,
     UserDocumentModule,
     ProjectModule,
+    ProjectDocumentModule,
+    LegalModule,
   ],
   controllers: [AppController],
   providers: [WinstonLoggerService],

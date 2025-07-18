@@ -20,4 +20,7 @@ export enum ApiMessageKey {
   GET_DETAIL_PROJECT_SUCCESS = 'Get project detail successfully.',
   GET_ALL_PROJECT_INVESTMENT = 'Get all projects for investor successfully.',
   GET_ALL_PROJECT_LEGAL_PERSON = 'Get all projects for legal person successfully.',
+  VERIFIED_MULTI_PROJECT_DOCUMENT_SUCCESS = 'Verified multi project document successfully.',
+  VERIFIED_PROJECT_DOCUMENT_SUCCESS = 'Verified project document successfully.',
+  DELETE_PROJECT_SUCCESS = 'Delete project successfully.',
 }
