@@ -42,7 +42,7 @@ export class LegalController {
     await this.legalService.reviewProjectFeedback(dto, reviewerId);
   }
 
-  @Get('legal')
+  @Get()
   async findAllProject(@Query() query: FindAllProjectDto) {
     try {
       const { data, pagination } = await this.legalService.findAllProject(query);

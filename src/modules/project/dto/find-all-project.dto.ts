@@ -1,4 +1,5 @@
 import { RangeDateRequestDto } from '@common/classes/request.dto';
+import { CurrentStatus } from '@common/constants/enum/project-detail.enum';
 import {
   ProjectSaleStatusEnum,
   ProjectType,
@@ -13,7 +14,8 @@ import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class FindAllProjectDto extends RangeDateRequestDto {
   @ApiProperty({
@@ -44,6 +46,28 @@ export class FindAllProjectDto extends RangeDateRequestDto {
   @IsOptional()
   @IsEnum(ProjectSaleStatusEnum)
   saleStatus: ProjectSaleStatusEnum;
+
+  @ApiProperty({
+    enum: CurrentStatus,
+    description:
+      'Current status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(CurrentStatus)
+  currentStatus: CurrentStatus;
+
+  @ApiProperty({ description: 'Minimum total project value', required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  minTotalValue: number;
+
+  @ApiProperty({ description: 'Maximum total project value', required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  maxTotalValue: number;
 }
 
 export class FindAllProjectResponseDto {

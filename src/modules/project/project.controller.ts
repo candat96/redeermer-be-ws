@@ -34,7 +34,7 @@ import { ProjectService } from './project.service';
 @Controller('project')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, RoleGuard)
-@Roles([UserRole.ADMIN, UserRole.INVESTOR])
+@Roles([UserRole.ADMIN, UserRole.USER])
 @UsePipes(new ValidationPipe({ transform: true }))
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
@@ -87,11 +87,15 @@ export class ProjectController {
     summary: 'Update project info',
     description: 'Update project info',
   })
-  async updateProject(@Param('id') id: string, @Body() body: UpdateProjectDto) {
+  async updateProject(
+    @Param('id') id: string,
+    @Body() body: UpdateProjectDto,
+    @AuthUser('id') userId: string,
+  ) {
     try {
       return new ApiResponseDto<boolean>({
         statusCode: HttpStatus.OK,
-        data: await this.projectService.updateProject(id, body),
+        data: await this.projectService.updateProject(id, body, userId),
         message: ApiMessageKey.UPDATE_PROJECT_SUCCESS,
         pagination: null,
       });
@@ -106,11 +110,11 @@ export class ProjectController {
     summary: 'Get project detail',
     description: 'Get project detail',
   })
-  async getProjectDetail(@Param('id') id: string) {
+  async getProjectDetail(@Param('id') id: string, @AuthUser('id') userId: string) {
     try {
       return new ApiResponseDto<FindOneProjectResponseDto>({
         statusCode: HttpStatus.OK,
-        data: await this.projectService.findOne(id),
+        data: await this.projectService.findOne(id, userId),
         message: ApiMessageKey.GET_DETAIL_PROJECT_SUCCESS,
         pagination: null,
       });
@@ -125,11 +129,11 @@ export class ProjectController {
     summary: 'Delete project',
     description: 'Delete project',
   })
-  async deleteProject(@Param('id') id: string) {
+  async deleteProject(@Param('id') id: string, @AuthUser('id') userId: string) {
     try {
       return new ApiResponseDto<FindOneProjectResponseDto>({
         statusCode: HttpStatus.OK,
-        data: await this.projectService.delete(id),
+        data: await this.projectService.delete(id, userId),
         message: ApiMessageKey.DELETE_PROJECT_SUCCESS,
         pagination: null,
       });
