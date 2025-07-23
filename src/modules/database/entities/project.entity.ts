@@ -1,17 +1,20 @@
 import {
+  CurrentStatus,
+  LegalStatus,
+} from '@common/constants/enum/project-detail.enum';
+import {
   ProjectSaleStatusEnum,
   ProjectType,
   ProjectVerifiedStatus,
 } from '@common/constants/enum/project.enum';
-import { BaseEntity } from '@modules/database/entities/base.entity';
+import { BaseEntity, NumberColumn } from '@modules/database/entities/base.entity';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
-import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
-import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import BigNumber from 'bignumber.js';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('project')
 export class ProjectEntity extends BaseEntity {
@@ -65,16 +68,48 @@ export class ProjectEntity extends BaseEntity {
   @Column({ type: String, nullable: false })
   longitude: string;
 
-  @OneToOne(() => ProjectDetailEntity, (detail) => detail.project, { cascade: true })
-  detail: ProjectDetailEntity;
+  @Column({ type: String, nullable: false })
+  area: string;
 
-  @OneToOne(() => InvestmentInfoEntity, (info) => info.project, { cascade: true })
-  investmentInfo: InvestmentInfoEntity;
+  @Column({ type: Number, nullable: false })
+  numberOfFloors: number;
 
-  @OneToOne(() => ContactPersonEntity, (contact) => contact.project, {
+  @Column({ type: 'enum', enum: CurrentStatus, nullable: false })
+  currentStatus: CurrentStatus;
+
+  @Column({ type: 'date', nullable: true })
+  estimatedCompletionTime: Date;
+
+  @Column({
+    type: 'enum',
+    enum: LegalStatus,
+    nullable: false,
+    default: LegalStatus.NOT_VERIFIED,
+  })
+  legalStatus: LegalStatus;
+
+  @NumberColumn('bigint', { default: 0 })
+  proposedValue: BigNumber;
+
+  @NumberColumn('bigint', { default: 0 })
+  appraisedValue: BigNumber;
+
+  @NumberColumn('bigint', { default: 0 })
+  pricePerUnit: BigNumber;
+
+  @Column({ type: Number, default: 0 })
+  totalUnits: number;
+
+  @Column({ type: Number })
+  minUnits: number;
+
+  @Column({ type: Number })
+  maxUnits: number;
+
+  @OneToMany(() => ContactPersonEntity, (contact) => contact.project, {
     cascade: true,
   })
-  contactPerson: ContactPersonEntity;
+  contactPerson: ContactPersonEntity[];
 
   @OneToMany(() => ProjectDocumentEntity, (doc) => doc.project, { cascade: true })
   document: ProjectDocumentEntity[];

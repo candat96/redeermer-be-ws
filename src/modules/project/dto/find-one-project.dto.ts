@@ -4,8 +4,6 @@ import {
   ProjectVerifiedStatus,
 } from '@common/constants/enum/project.enum';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
-import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
-import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
@@ -25,13 +23,22 @@ export class FindOneProjectResponseDto {
   location: string;
   latitude: string;
   longitude: string;
-  createdAt: Date;
-  detail: ProjectDetailEntity;
-  investmentInfo: InvestmentInfoEntity;
-  contactPerson: ContactPersonEntity;
+  area: string;
+  numberOfFloors: number;
+  currentStatus: string;
+  estimatedCompletionTime: Date;
+  legalStatus: string;
+  proposedValue: BigNumber;
+  appraisedValue: BigNumber;
+  pricePerUnit: BigNumber;
+  totalUnits: number;
+  minUnits: number;
+  maxUnits: number;
+  contactPerson: ContactPersonEntity[];
   document: ProjectDocumentEntity[];
   tags: ProjectTagEntity[];
   fieldReviews: ProjectFieldReviewEntity[];
+  createdAt: Date;
 
   constructor(project: ProjectEntity) {
     this.id = project.id;
@@ -47,12 +54,21 @@ export class FindOneProjectResponseDto {
     this.location = project.location;
     this.latitude = project.latitude;
     this.longitude = project.longitude;
-    this.createdAt = new Date(project.createdAt);
-    this.detail = project.detail;
-    this.investmentInfo = project.investmentInfo;
+    this.area = project.area;
+    this.numberOfFloors = project.numberOfFloors;
+    this.currentStatus = project.currentStatus;
+    this.estimatedCompletionTime = project.estimatedCompletionTime;
+    this.legalStatus = project.legalStatus;
+    this.proposedValue = project.proposedValue;
+    this.appraisedValue = project.appraisedValue;
+    this.pricePerUnit = project.pricePerUnit;
+    this.totalUnits = project.totalUnits;
+    this.minUnits = project.minUnits;
+    this.maxUnits = project.maxUnits;
     this.contactPerson = project.contactPerson;
     this.document = project.document;
     this.tags = project.tags;
     this.fieldReviews = project.fieldReviews;
+    this.createdAt = new Date(project.createdAt);
   }
 }

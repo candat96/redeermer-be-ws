@@ -1,5 +1,4 @@
 import { ErrorCode } from '@common/constants/error.constant';
-import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { VerifyMultipleProjectDocumentsDto } from '@modules/project-document/dto/verify-multi-project-document.dto';
@@ -13,8 +12,6 @@ export class ProjectDocumentService {
   constructor(
     @InjectRepository(ProjectEntity)
     private readonly projectRepository: Repository<ProjectEntity>,
-    @InjectRepository(ProjectDetailEntity)
-    private readonly projectDetailRepository: Repository<ProjectDetailEntity>,
     @InjectRepository(ProjectDocumentEntity)
     private readonly projectDocumentRepository: Repository<ProjectDocumentEntity>,
   ) {}
