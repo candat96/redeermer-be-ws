@@ -5,8 +5,6 @@ import {
 } from '@common/constants/enum/project-field-review.enum';
 import { ErrorCode } from '@common/constants/error.constant';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
-import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
-import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
@@ -21,25 +19,16 @@ import { FindOneProjectResponseDto } from '@modules/project/dto/find-one-project
 import { UpdateProjectDto } from '@modules/project/dto/update-project.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  EntityManager,
-  ILike,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm';
+import BigNumber from 'bignumber.js';
+import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(ProjectEntity)
     private readonly projectRepository: Repository<ProjectEntity>,
-    @InjectRepository(ProjectDetailEntity)
-    private readonly projectDetailRepository: Repository<ProjectDetailEntity>,
     @InjectRepository(ContactPersonEntity)
     private readonly contractRepository: Repository<ContactPersonEntity>,
-    @InjectRepository(InvestmentInfoEntity)
-    private readonly investmentInfoRepository: Repository<InvestmentInfoEntity>,
     @InjectRepository(ProjectDocumentEntity)
     private readonly projectDocumentRepository: Repository<ProjectDocumentEntity>,
     @InjectRepository(ProjectTagEntity)
@@ -64,42 +53,33 @@ export class ProjectService {
           location: dto.location,
           latitude: dto.latitude,
           longitude: dto.longitude,
+          area: dto.area,
+          numberOfFloors: dto.numberOfFloors,
+          currentStatus: dto.currentStatus,
+          estimatedCompletionTime: dto.estimatedCompletionTime,
+          legalStatus: dto.legalStatus,
+          proposedValue: dto.proposedValue,
+          appraisedValue: dto.appraisedValue,
+          pricePerUnit: dto.pricePerUnit,
+          totalUnits: dto.totalUnits,
+          minUnits: dto.minUnits,
+          maxUnits: dto.maxUnits,
           owner: manager.create(UserEntity, { id: userId }),
         });
 
         await manager.insert(ProjectEntity, project);
 
-        const detail = manager.create(ProjectDetailEntity, {
-          area: dto.detail.area,
-          numberOfFloors: dto.detail.numberOfFloors,
-          currentStatus: dto.detail.currentStatus,
-          estimatedCompletionTime: dto.detail.estimatedCompletionTime,
-          legalStatus: dto.detail.legalStatus,
-          project: manager.create(ProjectEntity, { id: project.id }),
-        });
+        const contacts = dto.contactPerson.map((c) =>
+          manager.create(ContactPersonEntity, {
+            fullName: c.fullName,
+            phone: c.phone,
+            email: c.email,
+            position: c.position,
+            project: manager.create(ProjectEntity, { id: project.id }),
+          }),
+        );
 
-        await manager.insert(ProjectDetailEntity, detail);
-
-        const investmentInfo = manager.create(InvestmentInfoEntity, {
-          proposedValue: dto.investmentInfo.proposedValue,
-          appraisedValue: dto.investmentInfo.appraisedValue,
-          pricePerUnit: dto.investmentInfo.pricePerUnit,
-          totalUnits: dto.investmentInfo.totalUnits,
-          minUnits: dto.investmentInfo.minUnits,
-          maxUnits: dto.investmentInfo.maxUnits,
-          project: manager.create(ProjectEntity, { id: project.id }),
-        });
-
-        await manager.insert(InvestmentInfoEntity, investmentInfo);
-
-        const contact = manager.create(ContactPersonEntity, {
-          fullName: dto.contactPerson.fullName,
-          phone: dto.contactPerson.phone,
-          email: dto.contactPerson.email,
-          position: dto.contactPerson.position,
-          project: manager.create(ProjectEntity, { id: project.id }),
-        });
-        await manager.insert(ContactPersonEntity, contact);
+        await manager.insert(ContactPersonEntity, contacts);
 
         const document = dto.documents.map((d) =>
           manager.create(ProjectDocumentEntity, {
@@ -149,7 +129,7 @@ export class ProjectService {
           id: userId,
         },
       },
-      relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
+      relations: ['contactPerson', 'document', 'tags'],
     });
 
     if (!project) {
@@ -157,23 +137,12 @@ export class ProjectService {
     }
 
     await this.projectRepository.manager.transaction(async (manager) => {
-      if (project.detail) {
-        manager.merge(ProjectDetailEntity, project.detail, dto.detail);
-        await manager.save(project.detail);
-      }
-
-      if (project.investmentInfo) {
-        manager.merge(
-          InvestmentInfoEntity,
-          project.investmentInfo,
-          dto.investmentInfo,
+      if (project.contactPerson?.length) {
+        const updateContactPerson = dto.contactPerson.map((contact) =>
+          this.projectDocumentRepository.create({ ...contact, project }),
         );
-        await manager.save(project.investmentInfo);
-      }
 
-      if (project.contactPerson) {
-        manager.merge(ContactPersonEntity, project.contactPerson, dto.contactPerson);
-        await manager.save(project.contactPerson);
+        await manager.save(ContactPersonEntity, updateContactPerson);
       }
 
       if (dto.documents?.length) {
@@ -215,79 +184,88 @@ export class ProjectService {
           id: userId,
         },
       },
-      relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
+      relations: ['contactPerson', 'document', 'tags'],
     });
 
     return new FindOneProjectResponseDto(project);
   }
 
   async findAllInvestment(query: FindAllProjectDto, userId: string) {
-    const where: any = {
-      owner: { id: userId },
-    };
+    const qb = this.projectRepository
+      .createQueryBuilder('project')
+      .leftJoinAndSelect('project.contactPerson', 'contactPerson')
+      .leftJoinAndSelect('project.document', 'document')
+      .where('project.ownerId = :userId', { userId });
 
     if (query.search) {
-      where.name = ILike(`%${query.search}%`);
+      qb.andWhere('project.name LIKE :search', { search: `%${query.search}%` });
     }
 
     if (query.propertyType) {
-      where.propertyType = query.propertyType;
+      qb.andWhere('project.propertyType = :propertyType', {
+        propertyType: query.propertyType,
+      });
     }
 
     if (query.projectVerifiedStatus) {
-      where.projectVerifiedStatus = query.projectVerifiedStatus;
+      qb.andWhere('project.projectVerifiedStatus = :status', {
+        status: query.projectVerifiedStatus,
+      });
     }
 
     if (query.saleStatus) {
-      where.saleStatus = query.saleStatus;
+      qb.andWhere('project.saleStatus = :saleStatus', {
+        saleStatus: query.saleStatus,
+      });
     }
 
     if (query.currentStatus) {
-      where.currentStatus = query.currentStatus;
+      qb.andWhere('project.currentStatus = :currentStatus', {
+        currentStatus: query.currentStatus,
+      });
     }
 
-    if (query.fromDate || query.toDate) {
-      where.createdAt = {};
-      if (query.fromDate) {
-        where.createdAt.$gte = new Date(query.fromDate);
-      }
-      if (query.toDate) {
-        where.createdAt.$lte = new Date(query.toDate);
-      }
+    if (query.fromDate) {
+      qb.andWhere('project.createdAt >= :fromDate', {
+        fromDate: new Date(query.fromDate),
+      });
     }
 
-    if (query.minTotalValue || query.maxTotalValue) {
-      where.totalValue = {};
-      if (query.minTotalValue) {
-        where.totalValue = MoreThanOrEqual(query.minTotalValue);
-      }
-      if (query.maxTotalValue) {
-        where.totalValue = {
-          ...(where.totalValue || {}),
-          ...LessThanOrEqual(query.maxTotalValue),
-        };
-      }
+    if (query.toDate) {
+      qb.andWhere('project.createdAt <= :toDate', {
+        toDate: new Date(query.toDate),
+      });
     }
 
-    const [data, total] = await this.projectRepository.findAndCount({
-      where,
-      relations: {
-        investmentInfo: true,
-        detail: true,
-        contactPerson: true,
-        document: true,
-      },
-      take: !query.getAll ? query.limit : undefined,
-      skip: !query.getAll ? query.offset : undefined,
-      order: { createdAt: query.order },
-    });
+    if (query.minTotalValue) {
+      qb.andWhere('project.proposedValue >= :minValue', {
+        minValue: new BigNumber(query.minTotalValue).toFixed(),
+      });
+    }
+
+    if (query.maxTotalValue) {
+      qb.andWhere('project.proposedValue <= :maxValue', {
+        maxValue: new BigNumber(query.maxTotalValue).toFixed(),
+      });
+    }
+
+    qb.orderBy(
+      'project.createdAt',
+      (query.order ?? 'desc').toUpperCase() as 'ASC' | 'DESC',
+    );
+
+    if (!query.getAll) {
+      qb.skip(query.offset).take(query.limit);
+    }
+
+    const [data, total] = await qb.getManyAndCount();
 
     return new PaginatedResponse<FindAllProjectResponseDto>(
       data.map((item) => new FindAllProjectResponseDto(item)),
       {
         page: query.page,
         limit: query.limit,
-        total: total,
+        total,
       },
     );
   }

@@ -105,8 +105,6 @@ export class LegalService {
         verifiedStatus: query.projectVerifiedStatus ?? undefined,
       },
       relations: {
-        investmentInfo: true,
-        detail: true,
         contactPerson: true,
         document: true,
         // fieldReviews: true

@@ -27,87 +27,6 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 
-export class CreateProjectDetailDto {
-  @ApiProperty({ example: '1200.5', description: 'Total area in square meters' })
-  @IsString()
-  area: string;
-
-  @ApiProperty({ example: 10, description: 'Number of floors' })
-  @IsNumber()
-  numberOfFloors: number;
-
-  @ApiProperty({
-    description: 'Under Construction',
-    enum: CurrentStatus,
-    default: CurrentStatus.COMPLETED,
-    example: CurrentStatus.COMPLETED,
-  })
-  @IsEnum(CurrentStatus)
-  currentStatus?: CurrentStatus;
-
-  @ApiProperty({
-    example: '2026-06-30',
-    required: false,
-    description: 'Estimated completion date',
-  })
-  @IsOptional()
-  @IsDateString()
-  estimatedCompletionTime?: Date;
-
-  @ApiProperty({
-    description: 'Legal status',
-    enum: LegalStatus,
-    default: LegalStatus.NOT_VERIFIED,
-    example: LegalStatus.NOT_VERIFIED,
-  })
-  @IsEnum(LegalStatus)
-  legalStatus?: LegalStatus;
-}
-
-export class CreateInvestmentInfoDto {
-  @ApiProperty({
-    example: '1000000',
-    description: 'Proposed investment value for the project (e.g., 1,000,000 USD)',
-  })
-  @IsNumber()
-  proposedValue: number;
-
-  @ApiProperty({
-    example: 950000,
-    description: 'Appraised value for the project based on valuation reports',
-  })
-  @IsNumber()
-  appraisedValue: number;
-
-  @ApiProperty({
-    example: 500,
-    description: 'Price per investment unit (e.g., 500 USD per unit)',
-  })
-  @IsNumber()
-  pricePerUnit: number;
-
-  @ApiProperty({
-    example: 2000,
-    description: 'Total available investment units for the project',
-  })
-  @IsNumber()
-  totalUnits: number;
-
-  @ApiProperty({
-    example: 10,
-    description: 'Minimum number of units an investor can purchase',
-  })
-  @IsNumber()
-  minUnits: number;
-
-  @ApiProperty({
-    example: 500,
-    description: 'Maximum number of units an investor can purchase',
-  })
-  @IsNumber()
-  maxUnits: number;
-}
-
 export class CreateContactPersonDto {
   @ApiProperty({ example: 'John Doe', description: 'Contact name' })
   @IsString()
@@ -222,6 +141,7 @@ export class CreateProjectDto {
     description: 'Type of the project (e.g., Residential, Commercial, etc.)',
   })
   @IsEnum(ProjectType)
+  @IsNotEmpty()
   propertyType: ProjectType;
 
   @ApiProperty({
@@ -231,6 +151,7 @@ export class CreateProjectDto {
       'Verification status of the project (e.g., PENDING, APPROVED, REJECTED)',
   })
   @IsEnum(ProjectVerifiedStatus)
+  @IsNotEmpty()
   projectVerifiedStatus: ProjectVerifiedStatus;
 
   @ApiProperty({
@@ -240,6 +161,7 @@ export class CreateProjectDto {
       'Sale status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
   })
   @IsEnum(ProjectSaleStatusEnum)
+  @IsNotEmpty()
   saleStatus: ProjectSaleStatusEnum;
 
   @ApiProperty({
@@ -278,24 +200,93 @@ export class CreateProjectDto {
   @IsString()
   longitude?: string;
 
-  @ApiProperty({ type: () => CreateProjectDetailDto })
-  @ValidateNested()
-  @Type(() => CreateProjectDetailDto)
-  detail: CreateProjectDetailDto;
+  @ApiProperty({ example: '1200.5', description: 'Total area in square meters' })
+  @IsString()
+  area: string;
 
-  @ApiProperty({ type: () => CreateInvestmentInfoDto, required: true })
-  @ValidateNested()
-  @Type(() => CreateInvestmentInfoDto)
-  investmentInfo: CreateInvestmentInfoDto;
+  @ApiProperty({ example: 10, description: 'Number of floors' })
+  @IsNumber()
+  numberOfFloors: number;
 
-  @ApiProperty({ type: () => CreateContactPersonDto, required: true })
+  @ApiProperty({
+    description: 'Under Construction',
+    enum: CurrentStatus,
+    default: CurrentStatus.COMPLETED,
+    example: CurrentStatus.COMPLETED,
+  })
+  @IsEnum(CurrentStatus)
+  currentStatus?: CurrentStatus;
+
+  @ApiProperty({
+    example: '2026-06-30',
+    required: false,
+    description: 'Estimated completion date',
+  })
+  @IsOptional()
+  @IsDateString()
+  estimatedCompletionTime?: Date;
+
+  @ApiProperty({
+    description: 'Legal status',
+    enum: LegalStatus,
+    default: LegalStatus.NOT_VERIFIED,
+    example: LegalStatus.NOT_VERIFIED,
+  })
+  @IsEnum(LegalStatus)
+  legalStatus?: LegalStatus;
+
+  @ApiProperty({
+    example: '1000000',
+    description: 'Proposed investment value for the project (e.g., 1,000,000 USD)',
+  })
+  @IsNumber()
+  proposedValue: number;
+
+  @ApiProperty({
+    example: 950000,
+    description: 'Appraised value for the project based on valuation reports',
+  })
+  @IsNumber()
+  appraisedValue: number;
+
+  @ApiProperty({
+    example: 500,
+    description: 'Price per investment unit (e.g., 500 USD per unit)',
+  })
+  @IsNumber()
+  pricePerUnit: number;
+
+  @ApiProperty({
+    example: 2000,
+    description: 'Total available investment units for the project',
+  })
+  @IsNumber()
+  totalUnits: number;
+
+  @ApiProperty({
+    example: 10,
+    description: 'Minimum number of units an investor can purchase',
+  })
+  @IsNumber()
+  minUnits: number;
+
+  @ApiProperty({
+    example: 500,
+    description: 'Maximum number of units an investor can purchase',
+  })
+  @IsNumber()
+  maxUnits: number;
+
+  @ApiProperty({ type: () => [CreateContactPersonDto], required: true })
   @ValidateNested()
   @Type(() => CreateContactPersonDto)
-  contactPerson: CreateContactPersonDto;
+  @IsNotEmpty()
+  contactPerson: CreateContactPersonDto[];
 
   @ApiProperty({ type: [CreateProjectDocumentDto], required: true })
   @ValidateNested({ each: true })
   @Type(() => CreateProjectDocumentDto)
+  @IsNotEmpty()
   documents?: CreateProjectDocumentDto[];
 
   @ApiProperty({ type: [CreateProjectTagDto], required: false })

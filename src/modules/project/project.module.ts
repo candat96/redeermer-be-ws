@@ -1,6 +1,4 @@
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
-import { InvestmentInfoEntity } from '@modules/database/entities/investment-info.entity';
-import { ProjectDetailEntity } from '@modules/database/entities/project-detail.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
@@ -15,9 +13,7 @@ import { ProjectService } from './project.service';
   imports: [
     TypeOrmModule.forFeature([
       ProjectEntity,
-      ProjectDetailEntity,
       ContactPersonEntity,
-      InvestmentInfoEntity,
       ProjectDocumentEntity,
       ProjectTagEntity,
       ProjectFieldReviewEntity,
