@@ -39,8 +39,8 @@ export class CreateProjectDetailDto {
   @ApiProperty({
     description: 'Under Construction',
     enum: CurrentStatus,
-    default: CurrentStatus.COMPLETE,
-    example: CurrentStatus.COMPLETE,
+    default: CurrentStatus.COMPLETED,
+    example: CurrentStatus.COMPLETED,
   })
   @IsEnum(CurrentStatus)
   currentStatus?: CurrentStatus;
@@ -218,7 +218,7 @@ export class CreateProjectDto {
 
   @ApiProperty({
     enum: ProjectType,
-    example: ProjectType.URBAN,
+    example: ProjectType.OTHER,
     description: 'Type of the project (e.g., Residential, Commercial, etc.)',
   })
   @IsEnum(ProjectType)

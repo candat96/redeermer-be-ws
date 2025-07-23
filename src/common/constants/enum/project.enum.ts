@@ -1,8 +1,11 @@
 export enum ProjectType {
-  SUBURBAN = 'SUBURBAN',
-  URBAN = 'URBAN',
-  A_SCHOOLS = 'A_SCHOOLS',
-  SAFE_NEIGHBORHOOD = 'SAFE_NEIGHBORHOOD',
+  LAND_LOT = 'LAND_LOT',
+  SHOP_HOUSE = 'SHOP_HOUSE',
+  VILLA = 'VILLA',
+  HOTEL = 'HOTEL',
+  CONDOTEL = 'CONDOTEL',
+  OFFICE_BUILDING = 'OFFICE_BUILDING',
+  OTHER = 'OTHER',
 }
 
 export enum ProjectVerifiedStatus {

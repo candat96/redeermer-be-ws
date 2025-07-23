@@ -109,6 +109,7 @@ export class LegalService {
         detail: true,
         contactPerson: true,
         document: true,
+        // fieldReviews: true
       },
       take: !query.getAll ? query.limit : undefined,
       skip: !query.getAll ? query.offset : undefined,

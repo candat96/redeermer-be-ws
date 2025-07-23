@@ -21,7 +21,13 @@ import { FindOneProjectResponseDto } from '@modules/project/dto/find-one-project
 import { UpdateProjectDto } from '@modules/project/dto/update-project.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, ILike, Repository } from 'typeorm';
+import {
+  EntityManager,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 
 @Injectable()
 export class ProjectService {
@@ -135,9 +141,14 @@ export class ProjectService {
     );
   }
 
-  async updateProject(id: string, dto: UpdateProjectDto) {
+  async updateProject(id: string, dto: UpdateProjectDto, userId: string) {
     const project = await this.projectRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        owner: {
+          id: userId,
+        },
+      },
       relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
     });
 
@@ -196,9 +207,14 @@ export class ProjectService {
     return true;
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, userId: string) {
     const project = await this.projectRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        owner: {
+          id: userId,
+        },
+      },
       relations: ['detail', 'investmentInfo', 'contactPerson', 'document', 'tags'],
     });
 
@@ -206,11 +222,55 @@ export class ProjectService {
   }
 
   async findAllInvestment(query: FindAllProjectDto, userId: string) {
+    const where: any = {
+      owner: { id: userId },
+    };
+
+    if (query.search) {
+      where.name = ILike(`%${query.search}%`);
+    }
+
+    if (query.propertyType) {
+      where.propertyType = query.propertyType;
+    }
+
+    if (query.projectVerifiedStatus) {
+      where.projectVerifiedStatus = query.projectVerifiedStatus;
+    }
+
+    if (query.saleStatus) {
+      where.saleStatus = query.saleStatus;
+    }
+
+    if (query.currentStatus) {
+      where.currentStatus = query.currentStatus;
+    }
+
+    if (query.fromDate || query.toDate) {
+      where.createdAt = {};
+      if (query.fromDate) {
+        where.createdAt.$gte = new Date(query.fromDate);
+      }
+      if (query.toDate) {
+        where.createdAt.$lte = new Date(query.toDate);
+      }
+    }
+
+    if (query.minTotalValue || query.maxTotalValue) {
+      where.totalValue = {};
+      if (query.minTotalValue) {
+        where.totalValue = MoreThanOrEqual(query.minTotalValue);
+      }
+      if (query.maxTotalValue) {
+        where.totalValue = {
+          ...(where.totalValue || {}),
+          ...LessThanOrEqual(query.maxTotalValue),
+        };
+      }
+    }
+
     const [data, total] = await this.projectRepository.findAndCount({
-      where: {
-        name: query.search ? ILike(`%${query.search}%`) : undefined,
-        owner: { id: userId },
-      },
+      where,
       relations: {
         investmentInfo: true,
         detail: true,
@@ -232,8 +292,8 @@ export class ProjectService {
     );
   }
 
-  async delete(id: string) {
-    const project = await this.findOne(id);
+  async delete(id: string, userId: string) {
+    const project = await this.findOne(id, userId);
     if (!project) {
       throw new NotFoundException(ErrorCode.PROJECT_NOT_FOUND);
     }
