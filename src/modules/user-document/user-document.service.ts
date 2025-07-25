@@ -84,7 +84,7 @@ export class UserDocumentService {
     documentId: string,
     dto: VerifyUserDocumentDto,
     adminId: string,
-  ): Promise<true> {
+  ): Promise<boolean> {
     const doc = await this.docRepo.find({
       where: { id: documentId },
       relations: ['user'],

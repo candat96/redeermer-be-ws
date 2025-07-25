@@ -124,7 +124,7 @@ export class ProjectService {
     id: string,
     dto: UpdateProjectDto,
     userId: string,
-  ): Promise<true> {
+  ): Promise<boolean> {
     const project = await this.projectRepository.findOne({
       where: {
         id,
