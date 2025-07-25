@@ -1,5 +1,6 @@
 import { ErrorCode } from '@common/constants/error.constant';
 import { PaypalEndpoints } from '@common/constants/payment.constant';
+import { getErrorMessage } from '@common/utils/error-logger.util';
 import { HttpHelperService } from '@modules/http-helper/http-helper.service';
 import {
   CreateOrderDto,
@@ -11,9 +12,9 @@ import qs from 'qs';
 
 @Injectable()
 export class PaypalService {
-  constructor(private readonly httpService: HttpHelperService) {}
-
   private readonly logger = new Logger(PaypalService.name);
+
+  constructor(private readonly httpService: HttpHelperService) {}
 
   private async getAccessToken(): Promise<string> {
     const auth = Buffer.from(
@@ -35,8 +36,7 @@ export class PaypalService {
       });
       return response.access_token;
     } catch (error) {
-      console.log(error);
-      this.logger.error(error);
+      this.logger.error(getErrorMessage('GET_PAYPAL_ACCESS_TOKEN_FAILED'), error);
       throw new InternalServerErrorException(
         ErrorCode.GET_PAYPAL_ACCESS_TOKEN_FAILED,
       );
@@ -71,14 +71,16 @@ export class PaypalService {
       });
       const approve = result.links.find((item) => item.rel === 'approve');
       if (!approve) {
+        this.logger.error(getErrorMessage('NO_APPROVE_LINK_FOUND'), result);
         throw new InternalServerErrorException(
           ErrorCode.CREATE_PAYPAL_CHECKOUT_ORDER_FAILED,
         );
       }
 
+      this.logger.log(`PayPal order created successfully: ${result.id}`);
       return approve.href;
     } catch (error) {
-      this.logger.error(error);
+      this.logger.error(getErrorMessage('CREATE_PAYPAL_ORDER_FAILED'), error);
       throw new InternalServerErrorException(
         ErrorCode.CREATE_PAYPAL_CHECKOUT_ORDER_FAILED,
       );

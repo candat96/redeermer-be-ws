@@ -1,4 +1,4 @@
+import { UserRole } from '@common/constants/enum/user.enum';
 import { Reflector } from '@nestjs/core';
 
-// Todo: Replace any with role enum if it exists
-export const Roles = Reflector.createDecorator<any[]>();
+export const Roles = Reflector.createDecorator<UserRole[]>();

@@ -6,6 +6,7 @@ import { BasicHeader } from '@common/decorators/basic-header.decorator';
 import { Roles } from '@common/decorators/roles.decorator';
 import { AccessTokenDataDto, AuthGuard } from '@common/guards/auth.guard';
 import { RoleGuard } from '@common/guards/role.guard';
+import { getErrorMessage } from '@common/utils/error-logger.util';
 import {
   FindAllUserDto,
   FindAllUserResponseDto,
@@ -26,12 +27,15 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 @BasicHeader('User')
 @Controller('user')
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly userService: UserService) {}
 
   @Get()
@@ -56,7 +60,7 @@ export class UserController {
         pagination,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('FIND_ALL_USERS_FAILED'), err);
       throw err;
     }
   }
@@ -81,7 +85,7 @@ export class UserController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('GET_USER_PROFILE_FAILED'), err);
       throw err;
     }
   }
@@ -106,7 +110,7 @@ export class UserController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('FIND_USER_BY_ID_FAILED', { id }), err);
       throw err;
     }
   }
@@ -132,7 +136,7 @@ export class UserController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('UPDATE_USER_PROFILE_FAILED'), err);
       throw err;
     }
   }
@@ -159,7 +163,7 @@ export class UserController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('UPDATE_USER_FAILED', { id }), err);
       throw err;
     }
   }
@@ -183,7 +187,7 @@ export class UserController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('DELETE_USER_FAILED', { id }), err);
       throw err;
     }
   }

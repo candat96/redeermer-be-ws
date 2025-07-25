@@ -1,6 +1,7 @@
 import { ApiResponseDto } from '@common/classes/response.dto';
 import { ApiMessageKey } from '@common/constants/message.constant';
 import { BasicHeader } from '@common/decorators/basic-header.decorator';
+import { getErrorMessage } from '@common/utils/error-logger.util';
 import { AuthenticationService } from '@modules/authentication/authentication.service';
 import { LoginDto, LoginResponseDto } from '@modules/authentication/dto/login.dto';
 import {
@@ -20,12 +21,15 @@ import {
   Post,
   UsePipes,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 @BasicHeader('Authentication')
 @Controller('authentication')
 export class AuthenticationController {
+  private readonly logger = new Logger(AuthenticationController.name);
+
   constructor(private readonly authService: AuthenticationService) {}
 
   @Post('login')
@@ -44,7 +48,7 @@ export class AuthenticationController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('LOGIN_FAILED'), err);
       throw err;
     }
   }
@@ -67,7 +71,7 @@ export class AuthenticationController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('REGISTRATION_FAILED'), err);
       throw err;
     }
   }
@@ -90,7 +94,7 @@ export class AuthenticationController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('TOKEN_REFRESH_FAILED'), err);
       throw err;
     }
   }
@@ -111,7 +115,7 @@ export class AuthenticationController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('SEND_OTP_FAILED'), err);
       throw err;
     }
   }
@@ -132,7 +136,7 @@ export class AuthenticationController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('OTP_VERIFICATION_FAILED'), err);
       throw err;
     }
   }
