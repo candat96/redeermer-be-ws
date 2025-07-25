@@ -11,7 +11,6 @@ import { ProjectFieldReviewEntity } from '@modules/database/entities/project-fie
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import BigNumber from 'bignumber.js';
 import { IsEnum, IsNumberString, IsOptional } from 'class-validator';
 
 export class FindAllProjectDto extends RangeDateRequestDto {
@@ -98,9 +97,9 @@ export class FindAllProjectResponseDto {
   currentStatus: string;
   estimatedCompletionTime: Date;
   legalStatus: string;
-  proposedValue: BigNumber;
-  appraisedValue: BigNumber;
-  pricePerUnit: BigNumber;
+  proposedValue: string;
+  appraisedValue: string;
+  pricePerUnit: string;
   totalUnits: number;
   minUnits: number;
   maxUnits: number;
@@ -129,9 +128,9 @@ export class FindAllProjectResponseDto {
     this.currentStatus = project.currentStatus;
     this.estimatedCompletionTime = project.estimatedCompletionTime;
     this.legalStatus = project.legalStatus;
-    this.proposedValue = project.proposedValue;
-    this.appraisedValue = project.appraisedValue;
-    this.pricePerUnit = project.pricePerUnit;
+    this.proposedValue = project.proposedValue.toString();
+    this.appraisedValue = project.appraisedValue.toString();
+    this.pricePerUnit = project.pricePerUnit.toString();
     this.totalUnits = project.totalUnits;
     this.minUnits = project.minUnits;
     this.maxUnits = project.maxUnits;
