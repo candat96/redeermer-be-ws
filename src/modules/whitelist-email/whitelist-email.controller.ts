@@ -1,6 +1,7 @@
 import { ApiResponseDto } from '@common/classes/response.dto';
 import { ApiMessageKey } from '@common/constants/message.constant';
 import { BasicHeader } from '@common/decorators/basic-header.decorator';
+import { getErrorMessage } from '@common/utils/error-logger.util';
 import { AddWhitelistEmailDto } from '@modules/whitelist-email/dto/add-whitelist-email.dto';
 import { DeleteWhitelistEmailDto } from '@modules/whitelist-email/dto/delete-whitelist.dto';
 import { WhitelistEmailService } from '@modules/whitelist-email/whitelist-email.service';
@@ -11,12 +12,15 @@ import {
   Post,
   UsePipes,
   ValidationPipe,
+  Logger,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 @BasicHeader('Whitelist Email')
 @Controller('whitelist-email')
 export class WhitelistEmailController {
+  private readonly logger = new Logger(WhitelistEmailController.name);
+
   constructor(private readonly whitelistEmailService: WhitelistEmailService) {}
 
   @Post()
@@ -35,7 +39,7 @@ export class WhitelistEmailController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('ADD_EMAIL_TO_WHITELIST_FAILED'), err);
       throw err;
     }
   }
@@ -58,7 +62,7 @@ export class WhitelistEmailController {
         pagination: null,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(getErrorMessage('REMOVE_EMAIL_FROM_WHITELIST_FAILED'), err);
       throw err;
     }
   }

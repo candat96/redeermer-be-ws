@@ -13,6 +13,7 @@ export class ApiLoggerMiddleware implements NestMiddleware {
       const { statusCode, statusMessage } = res;
 
       this.logger.apiLog({
+        level: 'info',
         statusCode,
         statusMessage,
         ip,
@@ -21,6 +22,8 @@ export class ApiLoggerMiddleware implements NestMiddleware {
         params,
         query,
         body,
+        response: null,
+        apiLogger: true,
       });
     });
 

@@ -1,12 +1,13 @@
 import { PaginatedResponse } from '@common/classes/response.dto';
 import { UserDocumentVerifyStatusEnum } from '@common/constants/enum/user-document.enum';
+import { ErrorCode } from '@common/constants/error.constant';
 import { UserDocumentEntity } from '@modules/database/entities/user-document.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
 import { CreateUserDocumentDto } from '@modules/user-document/dto/create-user-document.dto';
 import { GetUserDocumentListDto } from '@modules/user-document/dto/get-list-user-document.dto';
 import { GetUserDocumentResponseDto } from '@modules/user-document/dto/get-user-document.dto.';
 import { VerifyUserDocumentDto } from '@modules/user-document/dto/verify-user-document.dto';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -19,7 +20,9 @@ export class UserDocumentService {
     private readonly userRepo: Repository<UserEntity>,
   ) {}
 
-  async getList(dto: GetUserDocumentListDto) {
+  async getList(
+    dto: GetUserDocumentListDto,
+  ): Promise<PaginatedResponse<GetUserDocumentResponseDto>> {
     const qb = this.docRepo
       .createQueryBuilder('doc')
       .leftJoinAndSelect('doc.user', 'user');
@@ -56,6 +59,10 @@ export class UserDocumentService {
   async uploadDocument(userId: string, dto: CreateUserDocumentDto) {
     const user = await this.userRepo.findOneByOrFail({ id: userId });
 
+    if (!user) {
+      throw new BadRequestException(ErrorCode.USER_NOT_FOUND);
+    }
+
     await this.docRepo.save(
       this.docRepo.create({
         ...dto,
@@ -77,21 +84,28 @@ export class UserDocumentService {
     documentId: string,
     dto: VerifyUserDocumentDto,
     adminId: string,
-  ) {
-    const doc = await this.docRepo.findOneOrFail({
+  ): Promise<boolean> {
+    const doc = await this.docRepo.find({
       where: { id: documentId },
       relations: ['user'],
     });
 
-    doc.status = dto.status;
-    doc.note = dto.note || null;
-    doc.verifiedAt = new Date();
-    doc.verifiedBy = await this.userRepo.findOneBy({ id: adminId });
+    if (!doc) {
+      throw new BadRequestException(ErrorCode.USER_DOCUMENT_NOT_FOUND);
+    }
+    await this.docRepo.save(
+      this.docRepo.create({
+        status: dto.status,
+        note: dto.note || null,
+        verifiedAt: new Date(),
+        verifiedBy: this.userRepo.create({ id: adminId }),
+      }),
+    );
 
-    return this.docRepo.save(doc);
+    return true;
   }
 
-  async isUserVerified(userId: string) {
+  async isUserVerified(userId: string): Promise<boolean> {
     const count = await this.docRepo.count({
       where: {
         user: { id: userId },

@@ -294,10 +294,4 @@ export class CreateProjectDto {
   @ValidateNested({ each: true })
   @Type(() => CreateProjectTagDto)
   tags?: CreateProjectTagDto[];
-
-  // @ApiProperty({ type: [CreateFieldReviewDto], required: false })
-  // @IsOptional()
-  // @ValidateNested({ each: true })
-  // @Type(() => CreateFieldReviewDto)
-  // fieldReviews?: CreateFieldReviewDto[];
 }

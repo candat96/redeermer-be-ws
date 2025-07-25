@@ -1,31 +1,53 @@
+import { PaginatedResponse } from '@common/classes/response.dto';
 import { ErrorCode } from '@common/constants/error.constant';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
-import { ProjectEntity } from '@modules/database/entities/project.entity';
+import { UserEntity } from '@modules/database/entities/user.entity';
+import {
+  GetProjectDocumentDto,
+  GetProjectDocumentResponse,
+} from '@modules/project-document/dto/get-project-document.dto';
 import { VerifyMultipleProjectDocumentsDto } from '@modules/project-document/dto/verify-multi-project-document.dto';
 import { VerifyProjectDocumentDto } from '@modules/project-document/dto/verify-project-document.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, In, Repository } from 'typeorm';
 
 @Injectable()
 export class ProjectDocumentService {
   constructor(
-    @InjectRepository(ProjectEntity)
-    private readonly projectRepository: Repository<ProjectEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(ProjectDocumentEntity)
     private readonly projectDocumentRepository: Repository<ProjectDocumentEntity>,
   ) {}
 
-  async getProjectDocument(query: any) {
-    console.log(query);
-    return await this.projectDocumentRepository.find();
+  async getProjectDocument(
+    query: GetProjectDocumentDto,
+  ): Promise<PaginatedResponse<GetProjectDocumentResponse>> {
+    const [data, total] = await this.projectDocumentRepository.findAndCount({
+      where: {
+        fileName: query.search ? ILike(`%${query.search}%`) : undefined,
+      },
+      relations: { project: true },
+      take: !query.getAll ? query.limit : undefined,
+      skip: !query.getAll ? query.offset : undefined,
+    });
+
+    return new PaginatedResponse<GetProjectDocumentResponse>(
+      data.map((item) => new GetProjectDocumentResponse(item)),
+      {
+        page: query.page,
+        limit: query.limit,
+        total,
+      },
+    );
   }
 
   async verifiedProjectDocument(
     documentId: string,
     dto: VerifyProjectDocumentDto,
     userId: string,
-  ) {
+  ): Promise<boolean> {
     const document = await this.projectDocumentRepository.findOne({
       where: { id: documentId },
       relations: ['verifiedBy'],
@@ -33,12 +55,12 @@ export class ProjectDocumentService {
 
     if (!document) throw new NotFoundException(ErrorCode.PROJECT_DOCUMENT_NOT_FOUND);
 
-    document.status = dto.status;
-    document.note = dto.note ?? null;
-    document.verifiedAt = new Date();
-    document.verifiedBy = { id: userId } as any;
-
-    await this.projectDocumentRepository.save(document);
+    await this.projectDocumentRepository.update(documentId, {
+      status: dto.status,
+      note: dto.note ?? null,
+      verifiedAt: new Date(),
+      verifiedBy: this.userRepository.create({ id: userId }),
+    });
     return true;
   }
 
@@ -48,20 +70,29 @@ export class ProjectDocumentService {
   ): Promise<boolean> {
     const { documentIds, status, note } = dto;
 
-    const documents = await this.projectDocumentRepository.findByIds(documentIds);
+    await this.projectDocumentRepository.manager.transaction(async (manager) => {
+      const documents = await manager.find(ProjectDocumentEntity, {
+        where: {
+          id: In(documentIds),
+        },
+      });
 
-    if (!documents.length) throw new NotFoundException('No documents found');
+      if (!documents.length) {
+        throw new NotFoundException(ErrorCode.PROJECT_DOCUMENT_NOT_FOUND);
+      }
 
-    const now = new Date();
+      const now = new Date();
 
-    for (const doc of documents) {
-      doc.status = status;
-      doc.note = note ?? null;
-      doc.verifiedAt = now;
-      doc.verifiedBy = { id: userId } as any;
-    }
+      for (const doc of documents) {
+        await manager.update(ProjectDocumentEntity, doc.id, {
+          status,
+          note: note ?? null,
+          verifiedAt: now,
+          verifiedBy: this.userRepository.create({ id: userId }),
+        });
+      }
+    });
 
-    await this.projectDocumentRepository.save(documents);
     return true;
   }
 }

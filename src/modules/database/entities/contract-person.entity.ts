@@ -4,16 +4,16 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('contact_person')
 export class ContactPersonEntity extends BaseEntity {
-  @Column()
+  @Column({ type: String, nullable: false })
   fullName: string;
 
-  @Column()
+  @Column({ type: String, nullable: false })
   email: string;
 
-  @Column()
+  @Column({ type: String, nullable: false })
   phone: string;
 
-  @Column()
+  @Column({ type: String, nullable: true })
   position: string;
 
   @ManyToOne(() => ProjectEntity, (project) => project.contactPerson)

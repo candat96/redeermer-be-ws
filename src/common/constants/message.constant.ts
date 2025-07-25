@@ -23,4 +23,6 @@ export enum ApiMessageKey {
   VERIFIED_MULTI_PROJECT_DOCUMENT_SUCCESS = 'Verified multi project document successfully.',
   VERIFIED_PROJECT_DOCUMENT_SUCCESS = 'Verified project document successfully.',
   DELETE_PROJECT_SUCCESS = 'Delete project successfully.',
+  VERIFY_USER_DOCUMENT_SUCCESS = 'Verify user document successfully.',
+  GET_LIST_USER_DOCUMENT_SUCCESS = 'Get list user document successfully.',
 }

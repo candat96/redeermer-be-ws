@@ -4,8 +4,8 @@ import { ProjectFieldReviewEnum } from '@common/constants/enum/project-field-rev
 import { ProjectVerifiedStatus } from '@common/constants/enum/project.enum';
 import { ErrorCode } from '@common/constants/error.constant';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project-field-reviews.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
-import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
 import { ReviewProjectFeedbackDto } from '@modules/legal/dto/legal-review-multiple-field.dto';
 import {
@@ -27,7 +27,7 @@ export class LegalService {
   async reviewProjectFeedback(
     dto: ReviewProjectFeedbackDto,
     reviewerId: string,
-  ): Promise<void> {
+  ): Promise<boolean> {
     await this.fieldReviewRepository.manager.transaction(async (manager) => {
       const project = await manager.findOne(ProjectEntity, {
         where: { id: dto.projectId },
@@ -46,28 +46,32 @@ export class LegalService {
           throw new NotFoundException(ErrorCode.FIELD_NAME_NOT_FOUND);
         }
 
-        fieldReview.status = status;
-        fieldReview.reviewerComment = comment || null;
-        fieldReview.reviewer = { id: reviewerId } as UserEntity;
-
-        await manager.save(ProjectFieldReviewEntity, fieldReview);
+        await manager.update(ProjectFieldReviewEntity, fieldReview.id, {
+          status,
+          reviewerComment: comment || null,
+          reviewer: manager.create(UserEntity, {
+            id: reviewerId,
+          }),
+        });
       }
 
       for (const { documentId, status, comment } of dto.documentReviews) {
-        const doc = await manager.findOne(ProjectDocumentEntity, {
+        const document = await manager.findOne(ProjectDocumentEntity, {
           where: { id: documentId, project: { id: dto.projectId } },
         });
 
-        if (!doc) {
+        if (!document) {
           throw new NotFoundException(ErrorCode.PROJECT_DOCUMENT_NOT_FOUND);
         }
 
-        doc.status = status;
-        doc.note = comment || null;
-        doc.verifiedBy = { id: reviewerId } as any;
-        doc.verifiedAt = new Date();
-
-        await manager.save(ProjectDocumentEntity, doc);
+        await manager.update(ProjectDocumentEntity, documentId, {
+          status,
+          note: comment || null,
+          verifiedBy: manager.create(UserEntity, {
+            id: reviewerId,
+          }),
+          verifiedAt: new Date(),
+        });
       }
 
       const allFieldReviews = await manager.find(ProjectFieldReviewEntity, {
@@ -96,9 +100,13 @@ export class LegalService {
         });
       }
     });
+
+    return true;
   }
 
-  async findAllProject(query: FindAllProjectDto) {
+  async findAllProject(
+    query: FindAllProjectDto,
+  ): Promise<PaginatedResponse<FindAllProjectResponseDto>> {
     const [data, total] = await this.projectRepository.findAndCount({
       where: {
         name: query.search ? ILike(`%${query.search}%`) : undefined,
@@ -107,7 +115,6 @@ export class LegalService {
       relations: {
         contactPerson: true,
         document: true,
-        // fieldReviews: true
       },
       take: !query.getAll ? query.limit : undefined,
       skip: !query.getAll ? query.offset : undefined,

@@ -6,6 +6,7 @@ import { BasicHeader } from '@common/decorators/basic-header.decorator';
 import { Roles } from '@common/decorators/roles.decorator';
 import { AuthGuard } from '@common/guards/auth.guard';
 import { RoleGuard } from '@common/guards/role.guard';
+import { getErrorMessage } from '@common/utils/error-logger.util';
 import {
   FindAllProjectDto,
   FindAllProjectResponseDto,
@@ -20,8 +21,9 @@ import {
   Get,
   Query,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ReviewProjectFeedbackDto } from './dto/legal-review-multiple-field.dto';
 import { LegalService } from './legal.service';
 
@@ -32,18 +34,42 @@ import { LegalService } from './legal.service';
 @Roles([UserRole.ADMIN, UserRole.LEGAL])
 @UsePipes(new ValidationPipe({ transform: true }))
 export class LegalController {
+  private readonly logger = new Logger(LegalController.name);
+
   constructor(private readonly legalService: LegalService) {}
 
   @Patch('review-feedback')
+  @ApiOperation({
+    summary: 'Review project feedback',
+    description: 'Review project feedback',
+  })
+  @ApiOkResponse({ type: ApiResponseDto<boolean> })
   async reviewMultipleFields(
     @Body() dto: ReviewProjectFeedbackDto,
     @AuthUser('id') reviewerId: string,
-  ) {
-    await this.legalService.reviewProjectFeedback(dto, reviewerId);
+  ): Promise<ApiResponseDto<boolean>> {
+    try {
+      return new ApiResponseDto<boolean>({
+        statusCode: HttpStatus.OK,
+        data: await this.legalService.reviewProjectFeedback(dto, reviewerId),
+        message: ApiMessageKey.CREATE_PROJECT_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      this.logger.error(getErrorMessage('REVIEW_PROJECT_FEEDBACK_FAILED'), err);
+      throw err;
+    }
   }
 
   @Get()
-  async findAllProject(@Query() query: FindAllProjectDto) {
+  @ApiOperation({
+    summary: 'Find all projects for legal review',
+    description: 'Find all projects for legal review',
+  })
+  @ApiOkResponse({ type: ApiResponseDto<FindAllProjectResponseDto> })
+  async findAllProject(
+    @Query() query: FindAllProjectDto,
+  ): Promise<ApiResponseDto<FindAllProjectResponseDto>> {
     try {
       const { data, pagination } = await this.legalService.findAllProject(query);
       return new ApiResponseDto<FindAllProjectResponseDto>({
@@ -53,7 +79,10 @@ export class LegalController {
         pagination: pagination,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(
+        getErrorMessage('FIND_ALL_PROJECTS_LEGAL_REVIEW_FAILED'),
+        err,
+      );
       throw err;
     }
   }

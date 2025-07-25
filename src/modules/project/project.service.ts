@@ -6,9 +6,9 @@ import {
 import { ErrorCode } from '@common/constants/error.constant';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project-field-reviews.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
-import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
 import { CreateProjectDto } from '@modules/project/dto/create-project.dto';
 import {
@@ -37,7 +37,7 @@ export class ProjectService {
     private readonly projectFileReviewRepository: Repository<ProjectFieldReviewEntity>,
   ) {}
 
-  async createProject(dto: CreateProjectDto, userId: string) {
+  async createProject(dto: CreateProjectDto, userId: string): Promise<boolean> {
     await this.projectRepository.manager.transaction(
       async (manager: EntityManager) => {
         const project = manager.create(ProjectEntity, {
@@ -115,13 +115,16 @@ export class ProjectService {
         );
 
         await manager.insert(ProjectFieldReviewEntity, fieldName);
-
-        return true;
       },
     );
+    return true;
   }
 
-  async updateProject(id: string, dto: UpdateProjectDto, userId: string) {
+  async updateProject(
+    id: string,
+    dto: UpdateProjectDto,
+    userId: string,
+  ): Promise<boolean> {
     const project = await this.projectRepository.findOne({
       where: {
         id,
@@ -190,7 +193,10 @@ export class ProjectService {
     return new FindOneProjectResponseDto(project);
   }
 
-  async findAllInvestment(query: FindAllProjectDto, userId: string) {
+  async findAllInvestment(
+    query: FindAllProjectDto,
+    userId: string,
+  ): Promise<PaginatedResponse<FindAllProjectResponseDto>> {
     const qb = this.projectRepository
       .createQueryBuilder('project')
       .leftJoinAndSelect('project.contactPerson', 'contactPerson')
@@ -270,7 +276,7 @@ export class ProjectService {
     );
   }
 
-  async delete(id: string, userId: string) {
+  async delete(id: string, userId: string): Promise<boolean> {
     const project = await this.findOne(id, userId);
     if (!project) {
       throw new NotFoundException(ErrorCode.PROJECT_NOT_FOUND);

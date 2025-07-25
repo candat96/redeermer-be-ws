@@ -1,10 +1,11 @@
+import { ApiLogMessage, LogMessage } from '@common/interfaces/logger.interface';
 import { Injectable, LoggerService } from '@nestjs/common';
 import { consoleLoggerTransport } from '@src/config/logger.config';
 import winston from 'winston';
 
 @Injectable()
 export class WinstonLoggerService implements LoggerService {
-  private winston: any;
+  private winston: winston.Logger;
 
   constructor() {
     this.winston = winston.createLogger({
@@ -21,9 +22,10 @@ export class WinstonLoggerService implements LoggerService {
     });
   }
 
-  apiLog(message: any) {
+  apiLog(message: ApiLogMessage): void {
     this.winston.log({
       level: 'info',
+      message: `API ${message.method} ${message.originalUrl} - ${message.statusCode}`,
       statusCode: message.statusCode,
       method: message.method,
       originalUrl: message.originalUrl,
@@ -37,43 +39,90 @@ export class WinstonLoggerService implements LoggerService {
     });
   }
 
-  log(message: any, key?: string) {
-    this.winston.log({
-      level: 'info',
-      message,
-      key,
-    });
+  log(message: string | LogMessage, key?: string): void {
+    if (typeof message === 'string') {
+      this.winston.log({
+        level: 'info',
+        message,
+        key,
+      });
+    } else {
+      this.winston.log({
+        level: 'info',
+        message: message.message || 'Log message',
+        ...message,
+      });
+    }
   }
 
-  info(message: any, key?: string) {
-    this.winston.log({
-      level: 'info',
-      message,
-      key,
-    });
+  info(message: string | LogMessage, key?: string): void {
+    if (typeof message === 'string') {
+      this.winston.log({
+        level: 'info',
+        message,
+        key,
+      });
+    } else {
+      this.winston.log({
+        level: 'info',
+        message: message.message || 'Info message',
+        ...message,
+      });
+    }
   }
 
-  debug(message: any, key?: string) {
-    this.winston.log({
-      level: 'debug',
-      message,
-      key,
-    });
+  debug(message: string | LogMessage, key?: string): void {
+    if (typeof message === 'string') {
+      this.winston.log({
+        level: 'debug',
+        message,
+        key,
+      });
+    } else {
+      this.winston.log({
+        level: 'debug',
+        message: message.message || 'Debug message',
+        ...message,
+      });
+    }
   }
 
-  error(error: any, key?: string) {
-    this.winston.log({
-      level: 'info',
-      error,
-      key,
-    });
+  error(error: string | Error | LogMessage, key?: string): void {
+    if (typeof error === 'string') {
+      this.winston.log({
+        level: 'error',
+        message: error,
+        key,
+      });
+    } else if (error instanceof Error) {
+      this.winston.log({
+        level: 'error',
+        message: error.message,
+        error: error.stack,
+        key,
+      });
+    } else {
+      this.winston.log({
+        level: 'error',
+        message: error.message || 'Error occurred',
+        ...error,
+      });
+    }
   }
 
-  warn(message: any, key?: string) {
-    this.winston.log({
-      level: 'warn',
-      message,
-      key,
-    });
+  warn(message: string | LogMessage, key?: string): void {
+    if (typeof message === 'string') {
+      this.winston.log({
+        level: 'warn',
+        message,
+        key,
+      });
+    } else {
+      this.winston.log({
+        level: 'warn',
+        message: message.message || 'Warning message',
+        ...message,
+      });
+    }
   }
 }
