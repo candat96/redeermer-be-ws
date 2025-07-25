@@ -11,6 +11,7 @@ import { ProjectFieldReviewEntity } from '@modules/database/entities/project-fie
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import BigNumber from 'bignumber.js';
 import { IsEnum, IsNumberString, IsOptional } from 'class-validator';
 
 export class FindAllProjectDto extends RangeDateRequestDto {
@@ -18,6 +19,7 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     enum: ProjectType,
     description: 'Type of the project (e.g., Residential, Commercial, etc.)',
     required: false,
+    example: ProjectType.VILLA,
   })
   @IsOptional()
   @IsEnum(ProjectType)
@@ -28,6 +30,7 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     description:
       'Verification status of the project (e.g., PENDING, APPROVED, REJECTED)',
     required: false,
+    example: ProjectVerifiedStatus.PENDING,
   })
   @IsOptional()
   @IsEnum(ProjectVerifiedStatus)
@@ -38,6 +41,7 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     description:
       'Sale status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
     required: false,
+    example: ProjectSaleStatusEnum.ON_SALE,
   })
   @IsOptional()
   @IsEnum(ProjectSaleStatusEnum)
@@ -48,17 +52,28 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     description:
       'Current status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
     required: false,
+    example: CurrentStatus.COMPLETED,
   })
   @IsOptional()
   @IsEnum(CurrentStatus)
   currentStatus: CurrentStatus;
 
-  @ApiProperty({ description: 'Minimum total project value', required: false })
+  @ApiProperty({
+    description: 'Minimum total project value',
+    required: false,
+    example: 1000000,
+    type: Number,
+  })
   @IsOptional()
   @IsNumberString()
   minTotalValue: number;
 
-  @ApiProperty({ description: 'Maximum total project value', required: false })
+  @ApiProperty({
+    description: 'Maximum total project value',
+    required: false,
+    example: 5000000,
+    type: Number,
+  })
   @IsOptional()
   @IsNumberString()
   maxTotalValue: number;

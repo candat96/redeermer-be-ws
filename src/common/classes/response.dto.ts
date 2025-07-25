@@ -9,27 +9,45 @@ interface IPagination {
 }
 
 export class Pagination {
-  @ApiProperty()
+  @ApiProperty({
+    type: Number,
+    description: 'Current page number',
+  })
   @ApiResponseProperty()
   readonly page: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Number,
+    description: 'Number of items per page',
+  })
   @ApiResponseProperty()
   readonly limit: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Number,
+    description: 'Total number of items',
+  })
   @ApiResponseProperty()
   readonly total: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Number,
+    description: 'Total number of pages',
+  })
   @ApiResponseProperty()
   readonly totalPage: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Boolean,
+    description: 'Whether there is a previous page',
+  })
   @ApiResponseProperty()
   readonly hasPreviousPage: boolean;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Boolean,
+    description: 'Whether there is a next page',
+  })
   @ApiResponseProperty()
   readonly hasNextPage: boolean;
 
@@ -62,23 +80,41 @@ export class PaginatedResponse<T> {
 }
 
 export class ApiResponseDto<T> {
-  @ApiProperty({ example: HttpStatus.OK })
+  @ApiProperty({
+    type: Number,
+    example: HttpStatus.OK,
+    description: 'HTTP status code',
+  })
   @ApiResponseProperty()
   statusCode: HttpStatus;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Response data',
+  })
   @ApiResponseProperty()
   data: T;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Pagination,
+    required: false,
+    description: 'Pagination information',
+  })
   @ApiResponseProperty()
   pagination?: Pagination;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    type: Object,
+    required: false,
+    description: 'Additional metadata',
+  })
   @ApiResponseProperty()
   metadata?: Record<string, any>;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Response message',
+  })
   @ApiResponseProperty()
   message?: string;
 

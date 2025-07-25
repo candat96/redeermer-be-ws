@@ -1,32 +1,67 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
 export class SendOrderEmailDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'customer@example.com',
+    description: 'Customer email address',
+  })
   @IsString()
+  @IsNotEmpty()
   receiver: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'ORD-2024-001',
+    description: 'Order code',
+  })
   @IsString()
+  @IsNotEmpty()
   orderCode: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'John Doe',
+    description: 'Customer name',
+  })
   @IsString()
+  @IsNotEmpty()
   customerName: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+    example: '2024-01-15T10:30:00Z',
+    description: 'Order date',
+  })
   @IsDateString()
+  @IsNotEmpty()
   orderDate: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'PayPal',
+    description: 'Payment method',
+  })
   @IsString()
+  @IsNotEmpty()
   paymentMethod: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Number,
+    example: 1000.0,
+    description: 'Order amount',
+  })
   @IsNumber()
+  @IsNotEmpty()
   amount: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'order-confirmation-template',
+    description: 'Email template ID',
+  })
   @IsString()
+  @IsNotEmpty()
   templateId: string;
 }

@@ -113,7 +113,11 @@ export class CreateFieldReviewDto {
   @IsEnum(ProjectFieldReviewEnum)
   status: ProjectFieldReviewEnum;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Reviewer comment',
+  })
   @IsString()
   @IsOptional()
   reviewerComment?: string;

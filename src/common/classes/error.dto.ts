@@ -1,19 +1,31 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 
 export class ErrorDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: Number,
+    description: 'HTTP status code',
+  })
   @ApiResponseProperty()
   statusCode: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+    description: 'Error timestamp',
+  })
   @ApiResponseProperty()
   timestamp: Date | string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    description: 'Request path',
+  })
   @ApiResponseProperty()
   path: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    description: 'Error message',
+  })
   @ApiResponseProperty()
   message: string;
 }

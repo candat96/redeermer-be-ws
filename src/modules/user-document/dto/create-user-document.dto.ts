@@ -1,11 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsArray } from 'class-validator';
 
 export class CreateUserDocumentDto {
-  @ApiProperty({ example: 'National ID' })
+  @ApiProperty({
+    type: String,
+    example: 'National ID',
+    description: 'Document name',
+  })
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: [String],
+    description: 'Array of document URLs',
+  })
+  @IsArray()
   urls: string[];
 }
