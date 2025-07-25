@@ -6,12 +6,20 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 export class CreateEmailTemplateDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Email template title',
+  })
   @IsString()
   @IsOptional()
   title: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Email template content',
+  })
   @IsString()
   @IsOptional()
   content: string;
@@ -21,6 +29,7 @@ export class CreateEmailTemplateDto {
     enum: EmailTemplateScope,
     example: EmailTemplateScope.NOTIFICATION,
     required: true,
+    description: 'Email template scope',
   })
   @IsOptional()
   scope: EmailTemplateScope;
@@ -30,6 +39,7 @@ export class CreateEmailTemplateDto {
     enum: EmailTemplateStatus,
     example: EmailTemplateStatus.ACTIVE,
     required: true,
+    description: 'Email template status',
   })
   @IsOptional()
   status: EmailTemplateStatus.ACTIVE;

@@ -3,7 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class SendOtpDto {
-  @ApiProperty({ type: String, required: true })
+  @ApiProperty({
+    type: String,
+    required: true,
+    description: 'Email address to send OTP to',
+  })
   @IsString()
   @IsNotEmpty()
   email: string;
@@ -12,6 +16,7 @@ export class SendOtpDto {
     type: SendOtpScope,
     enum: SendOtpScope,
     required: true,
+    description: 'Purpose of OTP (register, reset password, etc.)',
   })
   @IsEnum(SendOtpScope)
   @IsNotEmpty()

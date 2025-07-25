@@ -9,16 +9,27 @@ import {
 } from 'class-validator';
 
 export class VerifyMultipleProjectDocumentsDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: [String],
+    description: 'Array of document IDs to verify',
+  })
   @IsArray()
   @ArrayNotEmpty()
   documentIds: string[];
 
-  @ApiProperty()
+  @ApiProperty({
+    type: ProjectDocumentVerifyStatusEnum,
+    enum: ProjectDocumentVerifyStatusEnum,
+    description: 'Verification status',
+  })
   @IsEnum(ProjectDocumentVerifyStatusEnum)
   status: ProjectDocumentVerifyStatusEnum;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Verification note',
+  })
   @IsOptional()
   @IsString()
   note?: string;

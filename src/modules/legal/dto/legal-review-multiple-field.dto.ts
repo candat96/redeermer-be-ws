@@ -14,47 +14,79 @@ import {
 } from 'class-validator';
 
 class FieldReviewItem {
-  @ApiProperty()
+  @ApiProperty({
+    type: FieldNameEnum,
+    enum: FieldNameEnum,
+    description: 'Field name to review',
+  })
   @IsEnum(FieldNameEnum)
   fieldName: FieldNameEnum;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: ProjectFieldReviewEnum,
+    enum: ProjectFieldReviewEnum,
+    description: 'Review status',
+  })
   @IsEnum(ProjectFieldReviewEnum)
   status: ProjectFieldReviewEnum;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Review comment',
+  })
   @IsOptional()
   @IsString()
   comment?: string;
 }
 
 class DocumentReviewItem {
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    description: 'Document ID to review',
+  })
   @IsString()
   documentId: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: ProjectDocumentVerifyStatusEnum,
+    enum: ProjectDocumentVerifyStatusEnum,
+    description: 'Document verification status',
+  })
   @IsEnum(ProjectDocumentVerifyStatusEnum)
   status: ProjectDocumentVerifyStatusEnum;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Review comment',
+  })
   @IsOptional()
   @IsString()
   comment?: string;
 }
 
 export class ReviewProjectFeedbackDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    description: 'Project ID to review',
+  })
   @IsString()
   projectId: string;
 
-  @ApiProperty({ type: [FieldReviewItem] })
+  @ApiProperty({
+    type: [FieldReviewItem],
+    description: 'Array of field reviews',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => FieldReviewItem)
   fieldReviews: FieldReviewItem[];
 
-  @ApiProperty({ type: [DocumentReviewItem] })
+  @ApiProperty({
+    type: [DocumentReviewItem],
+    description: 'Array of document reviews',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DocumentReviewItem)

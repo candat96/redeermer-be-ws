@@ -18,6 +18,7 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     enum: ProjectType,
     description: 'Type of the project (e.g., Residential, Commercial, etc.)',
     required: false,
+    example: ProjectType.VILLA,
   })
   @IsOptional()
   @IsEnum(ProjectType)
@@ -28,6 +29,7 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     description:
       'Verification status of the project (e.g., PENDING, APPROVED, REJECTED)',
     required: false,
+    example: ProjectVerifiedStatus.PENDING,
   })
   @IsOptional()
   @IsEnum(ProjectVerifiedStatus)
@@ -38,6 +40,7 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     description:
       'Sale status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
     required: false,
+    example: ProjectSaleStatusEnum.ON_SALE,
   })
   @IsOptional()
   @IsEnum(ProjectSaleStatusEnum)
@@ -48,17 +51,28 @@ export class FindAllProjectDto extends RangeDateRequestDto {
     description:
       'Current status of the project (e.g., ON_SALE, SOLD, PENDING, CANCELLED)',
     required: false,
+    example: CurrentStatus.COMPLETED,
   })
   @IsOptional()
   @IsEnum(CurrentStatus)
   currentStatus: CurrentStatus;
 
-  @ApiProperty({ description: 'Minimum total project value', required: false })
+  @ApiProperty({
+    description: 'Minimum total project value',
+    required: false,
+    example: 1000000,
+    type: Number,
+  })
   @IsOptional()
   @IsNumberString()
   minTotalValue: number;
 
-  @ApiProperty({ description: 'Maximum total project value', required: false })
+  @ApiProperty({
+    description: 'Maximum total project value',
+    required: false,
+    example: 5000000,
+    type: Number,
+  })
   @IsOptional()
   @IsNumberString()
   maxTotalValue: number;
@@ -83,9 +97,9 @@ export class FindAllProjectResponseDto {
   currentStatus: string;
   estimatedCompletionTime: Date;
   legalStatus: string;
-  proposedValue: BigNumber;
-  appraisedValue: BigNumber;
-  pricePerUnit: BigNumber;
+  proposedValue: string;
+  appraisedValue: string;
+  pricePerUnit: string;
   totalUnits: number;
   minUnits: number;
   maxUnits: number;
@@ -114,9 +128,9 @@ export class FindAllProjectResponseDto {
     this.currentStatus = project.currentStatus;
     this.estimatedCompletionTime = project.estimatedCompletionTime;
     this.legalStatus = project.legalStatus;
-    this.proposedValue = project.proposedValue;
-    this.appraisedValue = project.appraisedValue;
-    this.pricePerUnit = project.pricePerUnit;
+    this.proposedValue = project.proposedValue.toString();
+    this.appraisedValue = project.appraisedValue.toString();
+    this.pricePerUnit = project.pricePerUnit.toString();
     this.totalUnits = project.totalUnits;
     this.minUnits = project.minUnits;
     this.maxUnits = project.maxUnits;

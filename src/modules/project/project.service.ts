@@ -214,13 +214,13 @@ export class ProjectService {
     }
 
     if (query.projectVerifiedStatus) {
-      qb.andWhere('project.projectVerifiedStatus = :status', {
+      qb.andWhere('project.verifiedStatus = :status', {
         status: query.projectVerifiedStatus,
       });
     }
 
     if (query.saleStatus) {
-      qb.andWhere('project.saleStatus = :saleStatus', {
+      qb.andWhere('project.projectSaleStatus = :saleStatus', {
         saleStatus: query.saleStatus,
       });
     }
