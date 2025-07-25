@@ -38,12 +38,24 @@ export class LegalController {
   async reviewMultipleFields(
     @Body() dto: ReviewProjectFeedbackDto,
     @AuthUser('id') reviewerId: string,
-  ) {
-    await this.legalService.reviewProjectFeedback(dto, reviewerId);
+  ): Promise<ApiResponseDto<boolean>> {
+    try {
+      return new ApiResponseDto<boolean>({
+        statusCode: HttpStatus.OK,
+        data: await this.legalService.reviewProjectFeedback(dto, reviewerId),
+        message: ApiMessageKey.CREATE_PROJECT_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 
   @Get()
-  async findAllProject(@Query() query: FindAllProjectDto) {
+  async findAllProject(
+    @Query() query: FindAllProjectDto,
+  ): Promise<ApiResponseDto<FindAllProjectResponseDto>> {
     try {
       const { data, pagination } = await this.legalService.findAllProject(query);
       return new ApiResponseDto<FindAllProjectResponseDto>({

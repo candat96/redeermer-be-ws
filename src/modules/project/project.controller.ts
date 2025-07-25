@@ -69,14 +69,14 @@ export class ProjectController {
   async findAllInvestment(
     @Query() query: FindAllProjectDto,
     @AuthUser('id') userId: string,
-  ) {
+  ): Promise<ApiResponseDto<FindAllProjectResponseDto>> {
     const { data, pagination } = await this.projectService.findAllInvestment(
       query,
       userId,
     );
     return new ApiResponseDto<FindAllProjectResponseDto>({
       statusCode: HttpStatus.OK,
-      data: data,
+      data,
       message: ApiMessageKey.GET_ALL_PROJECT_INVESTMENT,
       pagination: pagination,
     });
@@ -91,7 +91,7 @@ export class ProjectController {
     @Param('id') id: string,
     @Body() body: UpdateProjectDto,
     @AuthUser('id') userId: string,
-  ) {
+  ): Promise<ApiResponseDto<boolean>> {
     try {
       return new ApiResponseDto<boolean>({
         statusCode: HttpStatus.OK,

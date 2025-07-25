@@ -16,4 +16,5 @@ export enum ErrorCode {
   PROJECT_NOT_FOUND = 'Project not found.',
   PROJECT_DOCUMENT_NOT_FOUND = 'Project document not found.',
   FIELD_NAME_NOT_FOUND = 'Verified field name not found.',
+  USER_DOCUMENT_NOT_FOUND = 'User document not found.',
 }

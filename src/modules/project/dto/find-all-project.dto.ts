@@ -7,9 +7,9 @@ import {
 } from '@common/constants/enum/project.enum';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project-field-reviews.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
 import { ProjectEntity } from '@modules/database/entities/project.entity';
-import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumberString, IsOptional } from 'class-validator';
 

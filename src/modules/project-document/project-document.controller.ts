@@ -2,6 +2,10 @@ import { ApiResponseDto } from '@common/classes/response.dto';
 import { ApiMessageKey } from '@common/constants/message.constant';
 import { AuthUser } from '@common/decorators/auth-user.decorator';
 import { AuthGuard } from '@common/guards/auth.guard';
+import {
+  GetProjectDocumentDto,
+  GetProjectDocumentResponse,
+} from '@modules/project-document/dto/get-project-document.dto';
 import { VerifyMultipleProjectDocumentsDto } from '@modules/project-document/dto/verify-multi-project-document.dto';
 import { VerifyProjectDocumentDto } from '@modules/project-document/dto/verify-project-document.dto';
 import {
@@ -32,13 +36,18 @@ export class ProjectDocumentController {
     summary: 'Get project document',
     description: 'Get project document',
   })
-  async getProjectDocument(@Query() query: any) {
+  async getProjectDocument(
+    @Query() query: GetProjectDocumentDto,
+  ): Promise<ApiResponseDto<GetProjectDocumentResponse>> {
     try {
-      return new ApiResponseDto({
+      const { data, pagination } =
+        await this.projectDocumentService.getProjectDocument(query);
+
+      return new ApiResponseDto<GetProjectDocumentResponse>({
         statusCode: HttpStatus.OK,
-        data: await this.projectDocumentService.getProjectDocument(query),
+        data,
         message: ApiMessageKey.GET_DOCUMENT_SUCCESS,
-        pagination: null,
+        pagination: pagination,
       });
     } catch (err) {
       console.log(err);
@@ -55,9 +64,9 @@ export class ProjectDocumentController {
     @Param('id') id: string,
     @Body() dto: VerifyProjectDocumentDto,
     @AuthUser('id') userId: string,
-  ) {
+  ): Promise<ApiResponseDto<boolean>> {
     try {
-      return new ApiResponseDto({
+      return new ApiResponseDto<boolean>({
         statusCode: HttpStatus.OK,
         data: await this.projectDocumentService.verifiedProjectDocument(
           id,
@@ -77,7 +86,7 @@ export class ProjectDocumentController {
   async verifyMultiple(
     @Body() dto: VerifyMultipleProjectDocumentsDto,
     @AuthUser('id') userId: string,
-  ) {
+  ): Promise<ApiResponseDto<boolean>> {
     try {
       return new ApiResponseDto({
         statusCode: HttpStatus.OK,

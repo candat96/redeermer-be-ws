@@ -3,6 +3,7 @@ import { ApiMessageKey } from '@common/constants/message.constant';
 import { AuthUser } from '@common/decorators/auth-user.decorator';
 import { AuthGuard } from '@common/guards/auth.guard';
 import { CreateUserDocumentDto } from '@modules/user-document/dto/create-user-document.dto';
+import { GetUserDocumentListDto } from '@modules/user-document/dto/get-list-user-document.dto';
 import { GetUserDocumentResponseDto } from '@modules/user-document/dto/get-user-document.dto.';
 import { VerifyUserDocumentDto } from '@modules/user-document/dto/verify-user-document.dto';
 import { UserDocumentService } from '@modules/user-document/user-document.service';
@@ -59,7 +60,9 @@ export class UserDocumentController {
     description: 'Get user document',
   })
   @ApiOkResponse({ type: ApiResponseDto<GetUserDocumentResponseDto> })
-  async getMine(@AuthUser('id') userId: string) {
+  async getMine(
+    @AuthUser('id') userId: string,
+  ): Promise<ApiResponseDto<GetUserDocumentResponseDto>> {
     try {
       return new ApiResponseDto<GetUserDocumentResponseDto>({
         statusCode: HttpStatus.OK,
@@ -83,7 +86,34 @@ export class UserDocumentController {
     @Param('id') id: string,
     @AuthUser('id') userId: string,
     @Body() dto: VerifyUserDocumentDto,
-  ) {
-    return this.userDocumentService.verifyDocument(id, dto, id);
+  ): Promise<ApiResponseDto<boolean>> {
+    try {
+      return new ApiResponseDto<boolean>({
+        statusCode: HttpStatus.OK,
+        data: await this.userDocumentService.verifyDocument(id, dto, userId),
+        message: ApiMessageKey.VERIFY_USER_DOCUMENT_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Get()
+  async getListUserDocument(
+    query: GetUserDocumentListDto,
+  ): Promise<ApiResponseDto<GetUserDocumentResponseDto>> {
+    try {
+      return new ApiResponseDto<GetUserDocumentResponseDto>({
+        statusCode: HttpStatus.OK,
+        data: await this.userDocumentService.getList(query),
+        message: ApiMessageKey.GET_LIST_USER_DOCUMENT_SUCCESS,
+        pagination: null,
+      });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 }

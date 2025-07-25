@@ -10,8 +10,8 @@ import {
 import { BaseEntity, NumberColumn } from '@modules/database/entities/base.entity';
 import { ContactPersonEntity } from '@modules/database/entities/contract-person.entity';
 import { ProjectDocumentEntity } from '@modules/database/entities/project-document.entity';
+import { ProjectFieldReviewEntity } from '@modules/database/entities/project-field-reviews.entity';
 import { ProjectTagEntity } from '@modules/database/entities/project-tag.entity';
-import { ProjectFieldReviewEntity } from '@modules/database/entities/project_field_reviews.entity';
 import { UserEntity } from '@modules/database/entities/user.entity';
 import BigNumber from 'bignumber.js';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
